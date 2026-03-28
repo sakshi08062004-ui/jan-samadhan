@@ -190,6 +190,8 @@ async def admin_login(credentials: UserLogin):
     user = get_user(credentials.username)
     if not user or not verify_password(credentials.password, user[3]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    if user[7] != 'admin':
+        raise HTTPException(status_code=403, detail="Admin access only")
     
     token = create_token(user[0], user[1])
     return {
@@ -440,7 +442,19 @@ def init_db():
     
     # Cleanup old feedback (only keep today's feedback)
     c.execute("DELETE FROM feedback WHERE date(created_at) < date('now', 'localtime')")
-    
+
+    # Seed default admin so the admin panel can log in on first run
+    c.execute("SELECT COUNT(*) FROM users WHERE role = 'admin'")
+    admin_exists = c.fetchone()[0]
+    if admin_exists == 0:
+        admin_hash = generate_password_hash("admin123")
+        c.execute("""
+            INSERT OR IGNORE INTO users (username, email, password_hash, full_name, role, points)
+            VALUES (?, ?, ?, ?, 'admin', 0)
+        """, ("admin", "admin@jan-samadhan.local", admin_hash, "Default Admin"))
+        # Use ASCII-only message to avoid encoding issues on some Windows terminals
+        print("Created default admin user -> username: admin / password: admin123")
+
     conn.commit()
     conn.close()
 
@@ -876,6 +890,3 @@ else:
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="127.0.0.1", port=8000)
-
-
-
