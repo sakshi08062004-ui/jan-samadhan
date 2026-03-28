@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAN SAMADHAN - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-bg: #f8fafc;
+            --sidebar-bg: #1e293b;
+            --sidebar-active: #3b82f6;
+            --header-bg: #ffffff;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body { background-color: var(--primary-bg); color: var(--text-main); overflow: hidden; }
+
+        /* ── Login ── */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e1b4b 100%);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .login-card {
+            background: rgba(255,255,255,0.95); padding: 2.5rem; border-radius: 1.5rem;
+            width: 100%; max-width: 400px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            text-align: center; backdrop-filter: blur(10px);
+        }
+        .login-card .shield-icon {
+            font-size: 3.5rem; color: #1e3a8a; margin-bottom: 1rem; background: #e0f2fe;
+            width: 80px; height: 80px; line-height: 80px; border-radius: 1rem;
+            margin-left: auto; margin-right: auto;
+        }
+        .login-card h1 { color: #1e1b4b; font-weight: 700; margin-bottom: 2rem; font-size: 1.75rem; }
+        .input-group { position: relative; margin-bottom: 1.5rem; }
+        .input-group i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #64748b; }
+        .input-group input {
+            width: 100%; padding: 0.875rem 1rem 0.875rem 2.8rem;
+            border: 2px solid #e2e8f0; border-radius: 0.75rem; outline: none;
+            transition: all 0.2s; font-size: 1rem;
+        }
+        .input-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 4px rgba(59,130,246,0.1); }
+        .login-btn {
+            width: 100%; padding: 1rem; background: #2563eb; color: white;
+            border: none; border-radius: 0.75rem; font-weight: 600; font-size: 1rem;
+            cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .login-btn:hover { background: #1d4ed8; }
+
+        /* ── Stats Grid ── */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white; border-radius: 12px; padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+            display: flex; flex-direction: column; gap: 0.5rem; transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card i { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 1.75rem; font-weight: 700; color: #1e293b; }
+        .stat-label { font-size: 0.875rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .color-total { color: #6366f1; }
+        .color-pending { color: #f59e0b; }
+        .color-resolving { color: #0ea5e9; }
+        .color-users { color: #8b5cf6; }
+        .color-contact { color: #ec4899; }
+
+        .graph-container {
+            background: white; border-radius: 12px; padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+            margin-bottom: 2rem; height: 350px;
+        }
+
+        /* ── Dashboard Layout ── */
+        #admin-dashboard { display: none; height: 100vh; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 260px; background: #1e1b4b; color: white; height: 100vh;
+            position: fixed; left: 0; top: 0; display: flex; flex-direction: column; z-index: 1000;
+        }
+        .sidebar-brand {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 2rem 1rem; border-bottom: 2px solid rgba(255,255,255,0.05); margin-bottom: 1rem;
+        }
+        .sidebar-brand img { width: 140px; max-width: 100%; margin-bottom: 0.5rem; border: 2px solid rgba(255,255,255,0.1); border-radius: 8px; }
+        .sidebar-brand .brand-label { color: #f8fafc; font-size: 1rem; font-weight: 700; letter-spacing: 0.5px; }
+        .sidebar-brand .brand-sub { color: #94a3b8; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.3px; margin-top: 0.1rem; }
+        .sidebar-menu { flex: 1; overflow-y: auto; padding-bottom: 2rem; }
+        .menu-item {
+            padding: 0.85rem 1.5rem; display: flex; align-items: center; gap: 1rem;
+            color: #d1d5db; text-decoration: none; transition: all 0.2s; cursor: pointer; font-weight: 500;
+        }
+        .menu-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .menu-item.active { background: #0ea5e9; color: white; box-shadow: 0 4px 12px rgba(14,165,233,0.3); }
+        .menu-item i { width: 24px; font-size: 1.2rem; text-align: center; }
+
+        /* ── Main Content ── */
+        .main-content { margin-left: 260px; height: 100vh; display: flex; flex-direction: column; width: calc(100% - 260px); }
+
+        header {
+            height: 64px; background-color: var(--header-bg); border-bottom: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem;
+            position: sticky; top: 0; z-index: 90;
+        }
+        .header-title { font-weight: 700; font-size: 1.1rem; display: flex; align-items: center; color: #1e293b; }
+        .header-actions { display: flex; align-items: center; gap: 1.5rem; }
+
+        .content-area { flex: 1; padding: 1.5rem; overflow-y: auto; background-color: #f1f5f9; }
+
+        .card { background: var(--card-bg); border-radius: 1rem; padding: 1.5rem; box-shadow: var(--shadow); margin-bottom: 1.5rem; }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .section-title { font-size: 1.1rem; font-weight: 600; color: var(--text-main); }
+
+        /* ── Analytics ── */
+        .analytics-wrapper {
+            display: flex; flex-direction: column; gap: 1.5rem;
+        }
+        .analytics-grid-2 {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;
+        }
+        .analytics-grid-priority {
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 1.5rem;
+        }
+        .analysis-card {
+            background: var(--card-bg); border-radius: 1rem; padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow); border: 1px solid var(--border-color);
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+        .analysis-card h3 { font-size: 1.05rem; font-weight: 600; margin: 0; }
+        .analysis-card canvas { width: 100% !important; height: 240px !important; max-height: 260px !important; }
+        .analysis-legend { display: flex; flex-direction: column; gap: 0.6rem; }
+        .analysis-legend-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: #475569; }
+        .analysis-legend-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        .analysis-legend-item span:last-child { font-weight: 600; margin-left: auto; }
+
+        .performance-list { display: flex; flex-direction: column; gap: 1rem; }
+        .performance-row { display: flex; flex-direction: column; gap: 0.4rem; }
+        .performance-row-top { display: flex; justify-content: space-between; align-items: center; }
+        .dept-subtext { font-size: 0.8rem; color: var(--text-secondary); }
+        .dept-rate { font-weight: 600; color: #0f172a; }
+        .performance-progress { height: 6px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+        .performance-progress-fill { height: 100%; background: linear-gradient(90deg, #2563eb, #10b981); transition: width 0.3s ease; }
+
+        /* ── Search & Filter ── */
+        .search-bar { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .search-input { flex: 1; position: relative; }
+        .search-input input { width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem; border: 1px solid var(--border-color); border-radius: 0.5rem; outline: none; }
+        .search-input i { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+        .filter-select { padding: 0.6rem 1rem; border: 1px solid var(--border-color); border-radius: 0.5rem; outline: none; background: white; min-width: 150px; }
+
+        /* ── Table ── */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 1rem; font-weight: 600; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.025em; }
+        td { padding: 1rem; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+
+        .badge { padding: 0.25rem 0.6rem; border-radius: 0.4rem; font-size: 0.75rem; font-weight: 600; text-transform: capitalize; }
+        .badge-pending   { background: #ef4444; color: #fff; }
+        .badge-resolved  { background: #10b981; color: #fff; }
+        .badge-in-progress { background: #0ea5e9; color: #fff; }
+        .badge-urgent    { background: #ef4444; color: #fff; }
+        .badge-high      { background: #f59e0b; color: #fff; }
+        .badge-medium    { background: #3b82f6; color: #fff; }
+        .badge-low       { background: #64748b; color: #fff; }
+        .bg-info         { background: #0ea5e9; color: #fff; }
+
+        .action-btns { display: flex; gap: 0.5rem; }
+        .btn-icon { width: 32px; height: 32px; border-radius: 0.4rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; border: none; }
+        .btn-view   { background: #3b82f6; color: white; }
+        .btn-assign { background: #f59e0b; color: white; }
+
+        /* ── Departments ── */
+        .dept-cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+        .dept-dashboard-card {
+            background: white; border-radius: 8px; padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;
+            border-top: 5px solid #cbd5e1; display: flex; flex-direction: column; gap: 0.75rem;
+        }
+        .dept-card-header { display: flex; justify-content: space-between; align-items: center; }
+        .dept-card-header h3 { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin: 0; }
+        .dept-badge { background: #f1f5f9; color: #334155; padding: 0.15rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; border: 1px solid #e2e8f0; }
+        .dept-desc { font-size: 0.875rem; color: #64748b; line-height: 1.4; margin: 0; }
+        .dept-field { font-size: 0.95rem; margin: 0; }
+        .dept-field strong { color: #1e293b; font-weight: 600; }
+
+        /* ── Stars ── */
+        .stars { color: #f59e0b; }
+        .user-id-small { font-size: 0.8rem; color: var(--text-secondary); display: block; }
+        .complaint-ref { font-size: 0.8rem; color: var(--text-secondary); display: block; }
+
+        /* ── Modal ── */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(4px); }
+        .modal-content { background: white; border-radius: 12px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); animation: modalFadeIn 0.3s ease-out; }
+        @keyframes modalFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; }
+        .modal-header h2 { font-size: 1.25rem; font-weight: 700; color: #1e293b; }
+        .close-modal { background: none; border: none; font-size: 1.5rem; color: #64748b; cursor: pointer; }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { padding: 1.25rem 1.5rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 1rem; }
+
+        .form-group { margin-bottom: 1.25rem; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.875rem; color: #475569; margin-bottom: 0.5rem; }
+        .form-control { width: 100%; padding: 0.625rem; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.95rem; color: #1e293b; transition: border-color 0.2s; }
+        .form-control:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+        .image-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .gallery-img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; }
+
+        .dept-stat-row { display:flex; flex-wrap:wrap; gap:0.4rem; }
+        .dept-stat-chip { font-size:0.75rem; font-weight:700; padding:0.25rem 0.6rem; border-radius:5px; color:white; }
+        .dept-view-btn {
+            margin-top:0.5rem; background:white; border:1.5px solid #3b82f6; color:#3b82f6;
+            padding:0.5rem 1rem; border-radius:6px; font-weight:600; font-size:0.875rem;
+            cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; transition:all 0.2s;
+        }
+        .dept-view-btn:hover { background:#3b82f6; color:white; }
+
+        @media (max-width: 1200px) {
+            .dept-cards-grid { grid-template-columns: repeat(2, 1fr); }
+            .analytics-grid-2, .analytics-grid-priority { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .dept-cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ── Assign Modal ── -->
+<div id="assign-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Assign Complaint to Department</h2>
+            <button class="close-modal" onclick="closeModal('assign-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="assign-form">
+                <input type="hidden" id="assign-complaint-id">
+                <div class="form-group">
+                    <label>Complaint ID / Title</label>
+                    <input type="text" id="assign-display-title" class="form-control" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Select Department</label>
+                    <select id="assign-dept-id" class="form-control" required>
+                        <option value="">-- Choose Department --</option>
+                        <option value="1">Water Department</option>
+                        <option value="2">Street Light Department</option>
+                        <option value="3">Road Department</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Assign To (Staff / Head)</label>
+                    <input type="text" id="assign-staff" class="form-control" placeholder="e.g. Rahul / Maintenance Team" required>
+                </div>
+                <div class="form-group">
+                    <label>Initial Status</label>
+                    <select id="assign-status" class="form-control" required>
+                        <option value="pending">Pending</option>
+                        <option value="in_progress" selected>In Progress</option>
+                        <option value="resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Admin Notes</label>
+                    <textarea id="assign-notes" class="form-control" rows="3" placeholder="Additional instructions for the department..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="login-btn" style="background:#64748b; width:auto; padding:0 1.5rem" onclick="closeModal('assign-modal')">Cancel</button>
+            <button class="login-btn" style="width:auto; padding:0 1.5rem" onclick="submitAssignment()">
+                <i class="fas fa-check"></i> Assign Now
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── View Modal ── -->
+<div id="view-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="view-title-detail">Complaint Details</h2>
+            <button class="close-modal" onclick="closeModal('view-modal')">&times;</button>
+        </div>
+        <div class="modal-body" id="view-modal-body"></div>
+        <div class="modal-footer">
+            <button class="login-btn" style="width:auto; padding:0 1.5rem" onclick="closeModal('view-modal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Login Screen ── -->
+<div id="login-screen">
+    <div class="login-card">
+        <div class="shield-icon"><i class="fas fa-shield-halved"></i></div>
+        <h1>Admin Login</h1>
+        <form id="login-form">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="username" placeholder="admin" required>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="login-btn">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- ── Admin Dashboard ── -->
+<div id="admin-dashboard">
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="jansamadhan-green.jpg" alt="Jan Samadhan Logo">
+            <div class="brand-sub">Admin Portal</div>
+        </div>
+        <div class="sidebar-menu">
+            <a class="menu-item active" data-view="dashboard" href="#dashboard"><i class="fas fa-th-large"></i> Dashboard</a>
+            <a class="menu-item" data-view="complaints" href="#complaints"><i class="fas fa-clipboard-list"></i> Complaints</a>
+            <a class="menu-item" data-view="analytics" href="#analytics"><i class="fas fa-chart-line"></i> Analytics</a>
+            <a class="menu-item" data-view="departments" href="#departments"><i class="fas fa-building"></i> Departments</a>
+            <a class="menu-item" data-view="contact" href="#contact"><i class="fas fa-envelope"></i> Contact</a>
+            <a class="menu-item" data-view="feedback" href="#feedback"><i class="fas fa-comment-dots"></i> Feedback</a>
+            <a class="menu-item" href="#logout" onclick="handleLogout(); return false;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="header-title">
+                Admin Dashboard
+            </div>
+            <div class="header-actions">
+                <div style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" style="width:32px; border-radius:50%;">
+                    <span style="font-weight:500;">Admin</span>
+                </div>
+            </div>
+        </header>
+        <div class="content-area" id="content-area"></div>
+    </div>
+</div>
+
+<script>
+// ── Chart instances ──
+let dashboardMainChart     = null;
+let deptDistributionChart  = null;
+let statusDistributionChart = null;
+let priorityAnalysisChart  = null;
+
+// ── App State ──
+const App = {
+    state: {
+        currentView: 'dashboard',
+        complaints: [],
+        feedback: [],
+        messages: [],
+        departments: [],
+        stats: { total_complaints: 0, pending_complaints: 0, in_progress_complaints: 0, total_users: 0, total_messages: 0 },
+        auth: localStorage.getItem('admin_token') || null,
+        activeDeptFilter: null
+    },
+
+    async api(endpoint, method = 'GET', body = null) {
+        const options = {
+            method,
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${this.state.auth}` }
+        };
+        if (body) options.body = JSON.stringify(body);
+        try {
+            const res = await fetch(`/api/admin${endpoint}`, options);
+            if (!res.ok) throw new Error(`API Error: ${res.status}`);
+            return await res.json();
+        } catch (err) {
+            console.error(`Fetch error for ${endpoint}:`, err);
+            return null;
+        }
+    },
+
+    async refreshData() {
+        const [complaintsData, feedbackData, messagesData, deptsData, statsData] = await Promise.all([
+            this.api('/complaints'),
+            this.api('/feedback'),
+            this.api('/messages'),
+            this.api('/departments'),
+            this.api('/dashboard')
+        ]);
+        if (complaintsData) this.state.complaints = complaintsData.complaints;
+        if (feedbackData)   this.state.feedback    = feedbackData.feedback;
+        if (messagesData)   this.state.messages     = messagesData.messages;
+        if (deptsData)      this.state.departments  = deptsData.departments;
+        if (statsData)      this.state.stats        = statsData;
+        this.render();
+    },
+
+    render() {
+        const container = document.getElementById('content-area');
+        switch (this.state.currentView) {
+            case 'dashboard':
+                container.innerHTML = views.dashboard();
+                setTimeout(initCharts, 100);
+                break;
+            case 'complaints':
+                container.innerHTML = views.complaints();
+                this.populateComplaints();
+                break;
+            case 'feedback':
+                container.innerHTML = views.feedback();
+                break;
+            case 'contact':
+                container.innerHTML = views.contact();
+                break;
+            case 'departments':
+                container.innerHTML = views.departments();
+                break;
+            case 'analytics':
+                container.innerHTML = views.analytics();
+                setTimeout(initAnalyticsCharts, 100);
+                break;
+        }
+    },
+
+    populateComplaints() {
+        let filtered = [...this.state.complaints];
+        if (this.state.activeDeptFilter) {
+            filtered = filtered.filter(c => c.department_id == this.state.activeDeptFilter);
+        }
+        const body = document.getElementById('complaintsBody');
+        if (!body) return;
+
+        body.innerHTML = filtered.map(c => {
+            let images = [];
+            try { images = JSON.parse(c.images || '[]'); } catch (e) {}
+            const thumbnail     = images.length > 0 ? (images[0].dataUrl || images[0].url || '') : '';
+            const priorityClass = (c.priority || 'medium').toLowerCase();
+            const statusClass   = (c.status   || 'pending').toLowerCase().replace(/\s+/g, '-');
+            const shortDesc     = c.description && c.description.length > 50
+                ? c.description.substring(0, 47) + '...' : (c.description || '');
+            const dateStr       = c.created_at ? c.created_at.split('.')[0].replace(' ', 'T') : null;
+            const formattedDate = dateStr ? new Date(dateStr).toLocaleDateString() : 'N/A';
+            const assignedTo    = c.assigned_to  || '—';
+            const adminNotes    = c.admin_notes  || '—';
+            const deptName      = c.department_name || 'Unassigned';
+
+            return `
+            <tr id="complaint-row-${c.id}">
+                <td>#${c.id}</td>
+                <td style="width:60px;">
+                    ${thumbnail
+                        ? `<img src="${thumbnail}" style="width:44px;height:44px;object-fit:cover;border-radius:6px;border:1px solid #e2e8f0;cursor:pointer" onclick="viewComplaintDetails(${c.id})">` 
+                        : `<div style="width:44px;height:44px;background:#f8fafc;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#cbd5e1;border:1px solid #e2e8f0;"><i class="fas fa-image"></i></div>` 
+                    }
+                </td>
+                <td style="font-weight:600;font-size:0.9rem;">${c.title}</td>
+                <td title="${c.description}" style="font-size:0.85rem;color:#64748b;max-width:200px;">${shortDesc}</td>
+                <td style="font-weight:500;">${deptName}</td>
+                <td><span class="badge badge-${statusClass}">${c.status || 'pending'}</span></td>
+                <td><span class="badge badge-${priorityClass}">${c.priority}</span></td>
+                <td style="font-size:0.85rem;color:#475569;">${c.location || 'N/A'}</td>
+                <td>${formattedDate}</td>
+                <td>
+                    <div class="action-btns">
+                        <button class="btn-icon btn-assign" title="Assign to Department" onclick="openAssignModal(${c.id})">
+                            <i class="fas fa-user-plus"></i>
+                        </button>
+                        <button class="btn-icon btn-view" title="View Details" onclick="viewComplaintDetails(${c.id})">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('') || '<tr><td colspan="10" style="text-align:center;padding:2rem;color:#94a3b8;">No complaints found.</td></tr>';
+    }
+};
+
+// ── View Templates ──
+const views = {
+
+    dashboard() {
+        const stats = App.state.stats || {};
+        return `
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-clipboard-list color-total"></i>
+                <div class="stat-value">${stats.total_complaints || 0}</div>
+                <div class="stat-label">Total Complaints</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock color-pending"></i>
+                <div class="stat-value">${stats.pending_complaints || 0}</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-tools color-resolving"></i>
+                <div class="stat-value">${stats.in_progress_complaints || 0}</div>
+                <div class="stat-label">Resolving</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-users color-users"></i>
+                <div class="stat-value">${stats.total_users || 0}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-envelope color-contact"></i>
+                <div class="stat-value">${stats.total_messages || 0}</div>
+                <div class="stat-label">Contact</div>
+            </div>
+        </div>
+        <div class="graph-container">
+            <canvas id="dashboardMainChart"></canvas>
+        </div>`;
+    },
+
+    complaints() {
+        const activeDept = App.state.departments.find(d => d.id === App.state.activeDeptFilter);
+        const titleText  = activeDept ? `Complaints — ${activeDept.name}` : 'Complaints';
+        return `
+        <div class="section-header">
+            <div class="section-title" style="font-size:1.5rem;">${titleText}</div>
+            <div class="search-bar">
+                ${App.state.activeDeptFilter
+                    ? `<button class="login-btn" style="width:auto;padding:0 1rem;background:#64748b;" onclick="clearDeptFilter()">
+                           <i class="fas fa-times"></i> Clear Filter
+                       </button>`
+                    : ''}
+                <div class="search-input">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="complaintSearch" placeholder="Search by title or department..." onkeyup="filterComplaints()">
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="table-container">
+                <table id="complaintsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Evidence</th>
+                            <th>Complaint Name</th>
+                            <th>Description</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                            <th>Address</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="complaintsBody"></tbody>
+                </table>
+            </div>
+        </div>`;
+    },
+
+    feedback() {
+        return `
+        <div class="section-header">
+            <div class="section-title" style="font-size:1.5rem;">
+                <i class="fas fa-comment-dots" style="color:#8b5cf6;margin-right:0.5rem;"></i> Feedback
+            </div>
+        </div>
+        <div class="card">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Citizen</th><th>Complaint</th>
+                            <th>Rating</th><th>Comment</th><th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${App.state.feedback.length ? App.state.feedback.map(f => `
+                        <tr>
+                            <td>#${f.id}</td>
+                            <td>
+                                <strong>${f.user_name || 'Anonymous'}</strong>
+                                <span class="user-id-small">User ID: ${f.user_id}</span>
+                            </td>
+                            <td>
+                                <strong>${f.complaint_title || 'General Feedback'}</strong>
+                                <span class="complaint-ref">${f.complaint_id ? '#' + f.complaint_id : 'No specific complaint'}</span>
+                            </td>
+                            <td><div class="stars">${generateStars(f.rating)}</div></td>
+                            <td style="max-width:300px;">${f.comment}</td>
+                            <td>${new Date(f.created_at).toLocaleDateString()}</td>
+                        </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8;">No feedback entries found.</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    },
+
+    contact() {
+        return `
+        <div class="section-header">
+            <div class="section-title" style="font-size:1.5rem;">
+                <i class="fas fa-envelope" style="color:#3b82f6;margin-right:0.5rem;"></i> Contact
+            </div>
+        </div>
+        <div class="card">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Name</th><th>Email</th>
+                            <th>Category</th><th>Message</th><th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${App.state.messages.length ? App.state.messages.map(m => `
+                        <tr style="cursor:pointer;" onclick="window.open('mailto:${m.email}?subject=Re: Jan Samadhan Inquiry')">
+                            <td>#${m.id}</td>
+                            <td><strong>${m.name}</strong></td>
+                            <td><a href="mailto:${m.email}">${m.email}</a></td>
+                            <td><span class="badge bg-info">${m.category}</span></td>
+                            <td style="max-width:400px;">${m.message}</td>
+                            <td>${new Date(m.created_at).toLocaleDateString()}</td>
+                        </tr>`).join('') : '<tr><td colspan="6" style="text-align:center;padding:2rem;color:#94a3b8;">No inquiries found.</td></tr>'}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    },
+
+    departments() {
+        const depts = App.state.departments || [];
+        const getDeptTheme = code => ({
+            'ROAD':  { color: '#10b981', badge: 'ROAD'  },
+            'LIGHT': { color: '#f59e0b', badge: 'LIGHT' },
+            'WATER': { color: '#0ea5e9', badge: 'WATER' }
+        }[code] || { color: '#3b82f6', badge: code });
+
+        return `
+        <div class="section-header">
+            <div class="section-title" style="font-size:1.5rem;">Departments</div>
+        </div>
+        <div class="dept-cards-grid">
+            ${depts.slice(0, 3).map(dept => {
+                const theme = getDeptTheme(dept.code);
+                const total      = dept.total_complaints      || 0;
+                const pending    = dept.pending_complaints     || 0;
+                const inProgress = dept.in_progress_complaints || 0;
+                const resolved   = dept.resolved_complaints    || 0;
+                return `
+                <div class="dept-dashboard-card" style="border-top-color:${theme.color};">
+                    <div class="dept-card-header">
+                        <h3>${dept.name}</h3>
+                        <span class="dept-badge">${theme.badge}</span>
+                    </div>
+                    <p class="dept-desc">${dept.description}</p>
+                    <p class="dept-field"><strong>Head:</strong> ${dept.head_name}</p>
+                    <p class="dept-field"><strong>Email:</strong> ${dept.contact_email || (dept.code.toLowerCase() + '@jan-samadhan.gov')}</p>
+
+                    <hr style="border:0;border-top:1px solid #e2e8f0;margin:0.5rem 0;">
+
+                    <div class="dept-stat-row">
+                        <span class="dept-stat-chip" style="background:#64748b;">Total: ${total}</span>
+                        <span class="dept-stat-chip" style="background:#f59e0b;">Pending: ${pending}</span>
+                        <span class="dept-stat-chip" style="background:#0ea5e9;">In Progress: ${inProgress}</span>
+                        <span class="dept-stat-chip" style="background:#10b981;">Resolved: ${resolved}</span>
+                    </div>
+
+                    <button class="dept-view-btn" data-dept-id="${dept.id}" onclick="openDeptComplaints(${dept.id}, '${dept.name}', this)">
+                        <i class="fas fa-eye"></i> View Complaints
+                    </button>
+                </div>`;
+            }).join('')}
+        </div>
+
+        <!-- ── Dept Complaints Panel ── -->
+        <div id="dept-complaints-panel" style="display:none; margin-top:1.5rem;">
+            <div class="card" style="padding:0;border:2px solid #3b82f6;">
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;border-bottom:1px solid #e2e8f0;background:#eff6ff;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                        <i class="fas fa-clipboard-list" style="color:#3b82f6;font-size:1.1rem;"></i>
+                        <span style="font-weight:700;font-size:1rem;color:#1e293b;" id="dept-panel-title">Department Complaints</span>
+                    </div>
+                    <button onclick="closeDeptComplaints()" style="background:none;border:1px solid #e2e8f0;cursor:pointer;color:#64748b;font-size:1rem;border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Department</th>
+                                <th>Assigned To</th>
+                                <th>Admin Notes</th>
+                                <th>Location</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dept-complaints-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>`;
+    },
+
+    analytics() {
+        return `
+        <div class="section-header">
+            <div class="section-title" style="font-size:1.5rem;">Analytics</div>
+        </div>
+        <div class="analytics-wrapper">
+            <div class="analytics-grid-2">
+                <div class="analysis-card">
+                    <h3>Department Distribution</h3>
+                    <canvas id="deptDistributionChart"></canvas>
+                    <div class="analysis-legend" id="deptLegend"></div>
+                </div>
+                <div class="analysis-card">
+                    <h3>Status Breakdown</h3>
+                    <canvas id="statusDistributionChart"></canvas>
+                    <div class="analysis-legend" id="statusLegend"></div>
+                </div>
+            </div>
+            <div class="analytics-grid-priority">
+                <div class="analysis-card">
+                    <h3>Priority Analysis</h3>
+                    <div class="analysis-legend" id="priorityLegend"></div>
+                    <canvas id="priorityAnalysisChart"></canvas>
+                </div>
+                <div class="analysis-card">
+                    <h3>Department Performance</h3>
+                    <div class="performance-list" id="deptPerformanceList"></div>
+                </div>
+            </div>
+        </div>
+        `;
+    }
+};
+
+// ── Chart Initialisers ──
+function initCharts() {
+    const ctx = document.getElementById('dashboardMainChart');
+    if (!ctx) return;
+
+    const depts       = App.state.departments || [];
+    const labels      = depts.map(d => d.name.replace(' Department', ''));
+    const totals      = depts.map(d => d.total_complaints  || 0);
+    const resolved    = depts.map(d => d.resolved_complaints || 0);
+
+    if (dashboardMainChart) dashboardMainChart.destroy();
+    dashboardMainChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [
+                { label: 'Total Complaints', data: totals,   backgroundColor: 'rgba(99,102,241,0.7)', borderColor: '#6366f1', borderWidth: 1 },
+                { label: 'Resolved',         data: resolved, backgroundColor: 'rgba(16,185,129,0.7)', borderColor: '#10b981', borderWidth: 1 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+}
+
+function initAnalyticsCharts() {
+    const departments = App.state.departments || [];
+    const complaints  = App.state.complaints  || [];
+
+    const statusCounts   = { pending: 0, in_progress: 0, resolved: 0, other: 0 };
+    const priorityCounts = { high: 0, medium: 0, low: 0 };
+
+    complaints.forEach(c => {
+        const sk = (c.status   || 'pending').toLowerCase().replace(/[^a-z_]/g, '_');
+        statusCounts[statusCounts.hasOwnProperty(sk) ? sk : 'other']++;
+        const pk = (c.priority || 'medium').toLowerCase();
+        if (priorityCounts.hasOwnProperty(pk)) priorityCounts[pk]++;
+    });
+
+    // Department Distribution
+    const deptCtx = document.getElementById('deptDistributionChart');
+    if (deptCtx) {
+        const deptLabels = departments.map(d => d.name);
+        const deptTotals = departments.map(d => d.total_complaints || 0);
+        const palette    = ['#3b82f6','#0ea5e9','#f97316','#10b981','#a855f7','#14b8a6','#ec4899'];
+        const deptColors = departments.map((_, i) => palette[i % palette.length]);
+
+        if (deptDistributionChart) deptDistributionChart.destroy();
+        deptDistributionChart = new Chart(deptCtx, {
+            type: 'doughnut',
+            data: { labels: deptLabels, datasets: [{ data: deptTotals, backgroundColor: deptColors, borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false } } }
+        });
+
+        const leg = document.getElementById('deptLegend');
+        if (leg) leg.innerHTML = departments.map((d, i) => `
+            <div class="analysis-legend-item">
+                <span class="analysis-legend-dot" style="background:${deptColors[i]}"></span>
+                <span>${d.name}</span>
+                <span>${d.total_complaints || 0}</span>
+            </div>`).join('') || '<div class="analysis-legend-item">No departments</div>';
+    }
+
+    // Status Breakdown
+    const statusCtx = document.getElementById('statusDistributionChart');
+    if (statusCtx) {
+        const statusKeys   = ['pending','in_progress','resolved','other'];
+        const statusLabels = ['Pending','In Progress','Resolved','Other'];
+        const statusColors = ['#f59e0b','#0ea5e9','#10b981','#a855f7'];
+        const statusValues = statusKeys.map(k => statusCounts[k]);
+
+        if (statusDistributionChart) statusDistributionChart.destroy();
+        statusDistributionChart = new Chart(statusCtx, {
+            type: 'doughnut',
+            data: { labels: statusLabels, datasets: [{ data: statusValues, backgroundColor: statusColors, borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false } } }
+        });
+
+        const leg = document.getElementById('statusLegend');
+        if (leg) leg.innerHTML = statusKeys.map((k, i) => `
+            <div class="analysis-legend-item">
+                <span class="analysis-legend-dot" style="background:${statusColors[i]}"></span>
+                <span>${statusLabels[i]}</span>
+                <span>${statusValues[i]}</span>
+            </div>`).join('');
+    }
+
+    // Priority Analysis
+    const priorityCtx = document.getElementById('priorityAnalysisChart');
+    if (priorityCtx) {
+        const priorityKeys   = ['high','medium','low'];
+        const priorityLabels = ['High','Medium','Low'];
+        const priorityColors = ['#ef4444','#f97316','#0ea5e9'];
+        const priorityValues = priorityKeys.map(k => priorityCounts[k]);
+
+        if (priorityAnalysisChart) priorityAnalysisChart.destroy();
+        priorityAnalysisChart = new Chart(priorityCtx, {
+            type: 'bar',
+            data: { labels: priorityLabels, datasets: [{ data: priorityValues, backgroundColor: priorityColors, borderRadius: 6, barThickness: 24 }] },
+            options: {
+                indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { beginAtZero: true, grid: { color: '#f1f5f9' } }, y: { grid: { display: false } } }
+            }
+        });
+
+        const leg = document.getElementById('priorityLegend');
+        if (leg) leg.innerHTML = priorityKeys.map((k, i) => `
+            <div class="analysis-legend-item">
+                <span class="analysis-legend-dot" style="background:${priorityColors[i]}"></span>
+                <span>${priorityLabels[i]}</span>
+                <span>${priorityValues[i]} complaints</span>
+            </div>`).join('');
+    }
+
+    // Department Performance
+    renderPerformanceList();
+}
+
+function renderPerformanceList() {
+    const container = document.getElementById('deptPerformanceList');
+    if (!container) return;
+    const departments = App.state.departments || [];
+    if (!departments.length) {
+        container.innerHTML = '<p class="dept-subtext">No department metrics available yet.</p>';
+        return;
+    }
+    container.innerHTML = departments.map(dept => {
+        const total    = dept.total_complaints    || 0;
+        const resolved = dept.resolved_complaints || 0;
+        const rate     = total > 0 ? Math.round((resolved / total) * 100) : 0;
+        return `
+        <div class="performance-row">
+            <div class="performance-row-top">
+                <div>
+                    <strong>${dept.name}</strong>
+                    <div class="dept-subtext">${resolved} resolved of ${total} complaints</div>
+                </div>
+                <span class="dept-rate">${rate}%</span>
+            </div>
+            <div class="performance-progress">
+                <div class="performance-progress-fill" style="width:${rate}%;"></div>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// ── Modal Helpers ──
+function openModal(id)  { document.getElementById(id).style.display = 'flex'; }
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function viewComplaintDetails(id) {
+    const c = App.state.complaints.find(x => x.id === id);
+    if (!c) return;
+
+    let images = [];
+    try { images = JSON.parse(c.images || '[]'); } catch (e) {}
+
+    document.getElementById('view-title-detail').innerText = `Complaint #${id}: ${c.title}`;
+    document.getElementById('view-modal-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div>
+            <p><strong>Description:</strong></p>
+            <p style="color:#475569;margin-bottom:1rem;">${c.description}</p>
+            <p><strong>Category:</strong> ${c.category}</p>
+            <p><strong>Location:</strong> ${c.location || 'N/A'}</p>
+            <p><strong>Status:</strong> <span class="badge badge-${(c.status||'').toLowerCase().replace(' ','-')}">${c.status}</span></p>
+            <p><strong>Priority:</strong> <span class="badge badge-${(c.priority||'').toLowerCase()}">${c.priority}</span></p>
+        </div>
+        <div>
+            <p><strong>Citizen Details:</strong></p>
+            <p>Name: ${c.username}</p>
+            <p>Email: ${c.email || 'N/A'}</p>
+            <p>Filed: ${new Date(c.created_at).toLocaleString()}</p>
+            <hr style="margin:1rem 0;border:0;border-top:1px solid #e2e8f0;">
+            <p><strong>Department Assignment:</strong></p>
+            <p>Department: ${c.department_name || 'Unassigned'}</p>
+            <p>Assigned To: ${c.assigned_to || 'N/A'}</p>
+            <p>Admin Notes: ${c.admin_notes || 'None'}</p>
+        </div>
+    </div>
+    <div style="margin-top:1.5rem;">
+        <p><strong>Evidence Images:</strong></p>
+        <div class="image-gallery">
+            ${images.map(img => `<img src="${img.dataUrl || img.url}" class="gallery-img" onclick="window.open('${img.dataUrl || img.url}','_blank')">`).join('')
+              || '<p style="color:#94a3b8;">No images uploaded.</p>'}
+        </div>
+    </div>`;
+    openModal('view-modal');
+}
+
+function openAssignModal(id) {
+    const c = App.state.complaints.find(x => x.id === id);
+    if (!c) return;
+    document.getElementById('assign-complaint-id').value = id;
+    document.getElementById('assign-display-title').value = `#${id}: ${c.title}`;
+    document.getElementById('assign-dept-id').value  = c.department_id || '';
+    document.getElementById('assign-staff').value    = c.assigned_to   || '';
+    document.getElementById('assign-status').value   = c.status        || 'in_progress';
+    document.getElementById('assign-notes').value    = c.admin_notes   || '';
+    openModal('assign-modal');
+}
+
+// Track which dept panel is currently open
+let activeDeptPanel = { id: null, name: null };
+let deptPanelComplaints = null;
+
+const DEPT_NAMES = { 1: 'Water Department', 2: 'Street Light Department', 3: 'Road Department' };
+
+function normalizeComplaintKeys(c) {
+    return {
+        ...c,
+        assigned_to: c.assigned_to ?? c.assignedTo ?? c.assigned_staff ?? c.assignedStaff ?? '',
+        admin_notes: c.admin_notes ?? c.adminNotes ?? c.notes ?? ''
+    };
+}
+
+async function submitAssignment() {
+    const id   = document.getElementById('assign-complaint-id').value;
+    const data = {
+        department_id: parseInt(document.getElementById('assign-dept-id').value),
+        assigned_to:   document.getElementById('assign-staff').value,
+        status:        document.getElementById('assign-status').value,
+        admin_notes:   document.getElementById('assign-notes').value
+    };
+    if (!data.department_id) { alert('Please select a department'); return; }
+
+    // ── Update local state immediately ──
+    const local = App.state.complaints.find(x => x.id == id);
+    if (local) {
+        local.department_id   = data.department_id;
+        local.department_name = DEPT_NAMES[data.department_id] || local.department_name;
+        local.assigned_to     = data.assigned_to;
+        local.status          = data.status;
+        local.admin_notes     = data.admin_notes;
+    }
+
+    closeModal('assign-modal');
+
+    // ── If in complaints view — update the row directly without full re-render ──
+    if (App.state.currentView === 'complaints') {
+        const row = document.getElementById(`complaint-row-${id}`);
+        if (row && local) {
+            const statusClass = local.status.toLowerCase().replace(/\s+/g, '-');
+            row.cells[4].innerHTML = `<span style="font-weight:500;">${local.department_name}</span>`;
+            row.cells[5].textContent = local.assigned_to || '—';
+            row.cells[6].innerHTML  = `<span class="badge badge-${statusClass}">${local.status}</span>`;
+            row.cells[7].textContent = local.admin_notes || '—';
+            row.cells[7].title       = local.admin_notes || '—';
+
+            // Green flash highlight
+            row.style.transition = 'background 0.4s';
+            row.style.background = '#ecfdf5';
+            setTimeout(() => { row.style.background = ''; }, 2500);
+
+            // Show inline success toast
+            showToast(`Complaint #${id} assigned to ${local.department_name} → ${local.assigned_to || 'Staff'}`);
+        }
+    }
+
+    // ── If in departments view — refresh the open panel ──
+    if (App.state.currentView === 'departments' && activeDeptPanel.id) {
+        App.render();
+        setTimeout(() => {
+            const activeBtn = document.querySelector(`.dept-view-btn[data-dept-id="${activeDeptPanel.id}"]`);
+            openDeptComplaints(activeDeptPanel.id, activeDeptPanel.name, activeBtn);
+        }, 80);
+    }
+
+    // ── Background API sync ──
+    try {
+        await App.api(`/complaints/${id}/assign`, 'PUT', data);
+    } catch (err) {
+        console.error('Assignment sync failed', err);
+    }
+}
+
+function showToast(msg) {
+    let t = document.getElementById('assign-toast');
+    if (!t) {
+        t = document.createElement('div');
+        t.id = 'assign-toast';
+        t.style.cssText = `position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;background:#10b981;color:#fff;
+            padding:0.75rem 1.25rem;border-radius:10px;font-size:0.875rem;font-weight:600;
+            display:flex;align-items:center;gap:0.5rem;box-shadow:0 4px 20px rgba(0,0,0,0.15);
+            opacity:0;transition:opacity 0.3s;pointer-events:none;max-width:380px;`;
+        document.body.appendChild(t);
+    }
+    t.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+    t.style.opacity = '1';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+}
+
+
+function refreshDeptPanelBody(deptId) {
+    const body = document.getElementById('dept-complaints-body');
+    if (!body) return;
+    const source = Array.isArray(deptPanelComplaints)
+        ? deptPanelComplaints
+        : App.state.complaints.filter(c => c.department_id == deptId);
+    const filtered = source.map(normalizeComplaintKeys);
+    body.innerHTML = filtered.map(c => {
+        const priorityClass = (c.priority || 'medium').toLowerCase();
+        const statusClass   = (c.status   || 'pending').toLowerCase().replace(/\s+/g, '-');
+        const dateStr       = c.created_at ? c.created_at.split('.')[0].replace(' ', 'T') : null;
+        const fmtDate       = dateStr ? new Date(dateStr).toLocaleDateString() : 'N/A';
+        const deptName      = c.department_name || 'Unassigned';
+        const assignedTo    = c.assigned_to    || '—';
+        const adminNotes    = c.admin_notes    || '—';
+        return `
+        <tr>
+            <td>#${c.id}</td>
+            <td style="font-weight:600;">${c.title}</td>
+            <td><span class="badge badge-${priorityClass}">${c.priority}</span></td>
+            <td><span class="badge badge-${statusClass}">${c.status}</span></td>
+            <td style="font-size:0.82rem;color:#1e293b;">${deptName}</td>
+            <td style="font-size:0.82rem;color:#1e293b;">${assignedTo}</td>
+            <td style="font-size:0.82rem;color:#475569;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${adminNotes}</td>
+            <td style="font-size:0.82rem;color:#475569;">${c.location || 'N/A'}</td>
+            <td style="font-size:0.82rem;">${fmtDate}</td>
+        </tr>`;
+    }).join('') || `<tr><td colspan="9" style="text-align:center;padding:2rem;color:#94a3b8;">No complaints for this department yet.</td></tr>`;
+}
+
+async function openDeptComplaints(deptId, deptName, btn) {
+    activeDeptPanel = { id: deptId, name: deptName };
+    deptPanelComplaints = null;
+    const panel = document.getElementById('dept-complaints-panel');
+    const title = document.getElementById('dept-panel-title');
+    if (!panel) return;
+    document.querySelectorAll('.dept-view-btn').forEach(b => { b.style.background='white'; b.style.color='#3b82f6'; });
+    if (btn) { btn.style.background='#3b82f6'; btn.style.color='white'; }
+    title.textContent = `${deptName} — Complaints`;
+    refreshDeptPanelBody(deptId);
+    panel.style.display = 'block';
+    setTimeout(() => panel.scrollIntoView({ behavior:'smooth', block:'start' }), 50);
+
+    const deptData = await App.api(`/departments/${deptId}/complaints`);
+    if (deptData && Array.isArray(deptData.complaints)) {
+        deptPanelComplaints = deptData.complaints.map(normalizeComplaintKeys);
+        deptPanelComplaints.forEach(item => {
+            const i = App.state.complaints.findIndex(x => x.id === item.id);
+            if (i >= 0) App.state.complaints[i] = { ...App.state.complaints[i], ...item };
+        });
+        refreshDeptPanelBody(deptId);
+    }
+}
+
+function closeDeptComplaints() {
+    const panel = document.getElementById('dept-complaints-panel');
+    if (panel) panel.style.display = 'none';
+    document.querySelectorAll('.dept-view-btn').forEach(b => {
+        b.style.background = 'white';
+        b.style.color = '#3b82f6';
+    });
+}
+
+// ── Navigation ──
+function switchView(viewName, updateHash = true) {
+    App.state.currentView = viewName;
+    document.querySelectorAll('.menu-item[data-view]').forEach(item => {
+        item.classList.toggle('active', item.getAttribute('data-view') === viewName);
+    });
+    App.render();
+    if (updateHash) {
+        history.replaceState(null, '', `#${viewName}`);
+    }
+}
+
+function filterByDept(deptId) {
+    App.state.activeDeptFilter = deptId;
+    switchView('complaints');
+}
+
+function clearDeptFilter() {
+    App.state.activeDeptFilter = null;
+    App.render();
+}
+
+function filterComplaints() {
+    const query = document.getElementById('complaintSearch').value.toLowerCase();
+    document.querySelectorAll('#complaintsTable tbody tr').forEach(row => {
+        if (row.cells.length < 5) return;
+        const text = [row.cells[2], row.cells[3], row.cells[4]]
+            .map(c => c.innerText.toLowerCase()).join(' ');
+        row.style.display = text.includes(query) ? '' : 'none';
+    });
+}
+
+function handleLogout() {
+    localStorage.removeItem('admin_token');
+    location.reload();
+}
+
+function generateStars(rating) {
+    const r = parseInt(rating || 0);
+    return Array.from({ length: 5 }, (_, i) =>
+        `<i class="${i < r ? 'fas' : 'far'} fa-star"></i>` 
+    ).join('');
+}
+
+// ── Auth ──
+document.getElementById('login-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const u   = document.getElementById('username').value.trim();
+    const p   = document.getElementById('password').value.trim();
+    const btn = e.target.querySelector('button');
+    if (!u || !p) { alert('Please enter username and password'); return; }
+
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+    btn.disabled  = true;
+
+    try {
+        const res  = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: u, password: p })
+        });
+        const data = await res.json();
+        if (res.ok && data.access_token) {
+            localStorage.setItem('admin_token', data.access_token);
+            App.state.auth = data.access_token;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('admin-dashboard').style.display = 'flex';
+            await App.refreshData();
+            switchView('dashboard');
+        } else {
+            alert('Login failed: ' + (data.detail || 'Invalid credentials'));
+        }
+    } catch (err) {
+        console.error('Login error:', err);
+        alert('Login error — check server (port 8000)');
+    } finally {
+        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+        btn.disabled  = false;
+    }
+});
+
+window.onload = async () => {
+    if (App.state.auth) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-dashboard').style.display = 'flex';
+        await App.refreshData();
+        const hashView = (location.hash || '#dashboard').replace('#', '');
+        switchView(hashView);
+    } else {
+        localStorage.removeItem('admin_token');
+        App.state.auth = null;
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('admin-dashboard').style.display = 'none';
+    }
+
+    document.querySelectorAll('.menu-item[data-view]').forEach(item => {
+        item.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            switchView(this.getAttribute('data-view'));
+        });
+    });
+
+    window.addEventListener('hashchange', () => {
+        const hv = (location.hash || '#dashboard').replace('#', '');
+        if (hv !== App.state.currentView) switchView(hv, false);
+    });
+};
+</script>
+</body>
+</html>
