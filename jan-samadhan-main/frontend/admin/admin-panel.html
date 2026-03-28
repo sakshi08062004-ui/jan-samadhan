@@ -381,7 +381,7 @@ const App = {
         feedback: [],
         messages: [],
         departments: [],
-        stats: { total_complaints: 0, pending_complaints: 0, in_progress_complaints: 0, total_users: 0, total_messages: 0 },
+        stats: { total_complaints: 0, pending_complaints: 0, in_progress_complaints: 0, resolved_complaints: 0, total_users: 0, total_messages: 0 },
         auth: localStorage.getItem('admin_token') || null,
         activeDeptFilter: null
     },
@@ -517,8 +517,8 @@ const views = {
             </div>
             <div class="stat-card">
                 <i class="fas fa-tools color-resolving"></i>
-                <div class="stat-value">${stats.in_progress_complaints || 0}</div>
-                <div class="stat-label">Resolving</div>
+                <div class="stat-value">${stats.resolved_complaints || stats.in_progress_complaints || 0}</div>
+                <div class="stat-label">Resolved</div>
             </div>
             <div class="stat-card">
                 <i class="fas fa-users color-users"></i>

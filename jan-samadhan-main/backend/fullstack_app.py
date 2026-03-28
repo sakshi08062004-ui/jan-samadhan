@@ -210,20 +210,15 @@ async def get_admin_dashboard():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     
-    c.execute("SELECT COUNT(*) FROM complaints")
-    total = c.fetchone()[0]
-    
-    c.execute("SELECT COUNT(*) FROM complaints WHERE status = 'pending'")
-    pending = c.fetchone()[0]
-    
-    c.execute("SELECT COUNT(*) FROM complaints WHERE status = 'resolved'")
-    resolved = c.fetchone()[0]
-    
-    c.execute("SELECT COUNT(*) FROM complaints WHERE status = 'in_progress'")
-    in_progress = c.fetchone()[0]
-    
-    c.execute("SELECT COUNT(*) FROM complaints WHERE status = 'rejected'")
-    rejected = c.fetchone()[0]
+    # Pull all complaint statuses once and normalize to avoid case/spacing variants
+    c.execute("SELECT status FROM complaints")
+    status_rows = [ (row[0] or "").strip().lower().replace(" ", "_").replace("-", "_") for row in c.fetchall() ]
+
+    total       = len(status_rows)
+    pending     = sum(s in {"pending", "open"} for s in status_rows)
+    in_progress = sum(s in {"in_progress", "processing", "resolving"} for s in status_rows)
+    resolved    = sum(s in {"resolved", "closed", "done"} for s in status_rows)
+    rejected    = sum(s in {"rejected", "declined"} for s in status_rows)
     
     c.execute("SELECT COUNT(*) FROM users")
     total_users = c.fetchone()[0]
