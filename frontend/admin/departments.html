@@ -1,0 +1,42 @@
+<!-- ── Departments View ── -->
+<div id="departments-view">
+    <div class="section-header">
+        <div class="section-title" style="font-size:1.5rem;">Departments</div>
+    </div>
+    <div class="dept-cards-grid">
+        <!-- Department cards will be populated here -->
+    </div>
+
+    <!-- ── Department Complaints Panel ── -->
+    <div id="dept-complaints-panel" style="display:none; margin-top:1.5rem;">
+        <div class="card" style="padding:0;border:2px solid #3b82f6;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;border-bottom:1px solid #e2e8f0;background:#eff6ff;">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <i class="fas fa-clipboard-list" style="color:#3b82f6;font-size:1.1rem;"></i>
+                    <span style="font-weight:700;font-size:1rem;color:#1e293b;" id="dept-panel-title">Department Complaints</span>
+                </div>
+                <button onclick="closeDeptComplaints()" style="background:none;border:1px solid #e2e8f0;cursor:pointer;color:#64748b;font-size:1rem;border-radius:6px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Department</th>
+                            <th>Assigned To</th>
+                            <th>Admin Notes</th>
+                            <th>Location</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dept-complaints-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

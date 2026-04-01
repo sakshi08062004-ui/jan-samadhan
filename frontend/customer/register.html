@@ -1,0 +1,89 @@
+<!-- ── Register Section ── -->
+<section id="register" class="py-5 content-section" style="display:none;">
+    <div class="container">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-md-6">
+                <div class="card shadow-lg bg-dark text-white border-0"
+                    style="border-radius: 20px; background: rgba(30,30,50,0.8) !important; backdrop-filter: blur(10px);">
+                    <div class="card-header text-center border-0 pt-4">
+                        <h4 class="fw-bold"><i class="fas fa-user-plus me-2 text-primary"></i>Create Your Account</h4>
+                    </div>
+                    <div class="card-body p-4">
+                        <form id="registerForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-white-50">Username *</label>
+                                        <input type="text" class="form-control bg-dark text-white border-secondary"
+                                            id="registerUsername" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                            <label class="form-label text-white-50">Email *</label>
+                                        <input type="email" class="form-control bg-dark text-white border-secondary"
+                                            id="registerEmail" placeholder="example@domain.com" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-white-50">Full Name *</label>
+                                <input type="text" class="form-control bg-dark text-white border-secondary"
+                                    id="registerFullName" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-white-50">Password (min 8 characters) *</label>
+                                        <input type="password"
+                                            class="form-control bg-dark text-white border-secondary"
+                                            id="registerPassword" placeholder="Minimum 8 characters" minlength="8" maxlength="50" required>
+                                        <small class="text-warning d-block mt-1">Password must be at least 8 characters</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-white-50">Confirm Password *</label>
+                                        <input type="password"
+                                            class="form-control bg-dark text-white border-secondary"
+                                            id="confirmPassword" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                            <label class="form-label text-white-50">Phone Number (10 digits)</label>
+                                        <input type="tel" class="form-control bg-dark text-white border-secondary"
+                                            id="registerPhone" placeholder="10 digit number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" required>
+                                        <small class="text-warning d-block mt-1">Phone must be exactly 10 digits</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-white-50">Address</label>
+                                        <input type="text" class="form-control bg-dark text-white border-secondary"
+                                            id="registerAddress">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn rounded-pill w-100 py-2 mt-3 fw-bold" id="registerBtn"
+                                style="background: linear-gradient(90deg, #0061ff, #60efff); border: none; color: white;">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </form>
+                        <div class="text-center mt-3">
+                            <p class="text-white-50">Already have an account? <a href="#"
+                                    class="text-primary fw-bold" onclick="showSection('login')">Login here</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 d-none d-lg-flex justify-content-center">
+                <div class="hero-glass-container">
+                    <img src="../modi-banner.png" alt="JAN SAMADHAN Leadership" class="hero-banner-img shadow-lg">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

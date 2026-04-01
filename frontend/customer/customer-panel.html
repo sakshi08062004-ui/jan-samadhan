@@ -1,0 +1,2424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JAN SAMADHAN - Customer Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Hind:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <style>
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #455a64;
+            --success-color: #00897b;
+            --warning-color: #ffa000;
+            --danger-color: #d32f2f;
+            --info-color: #0288d1;
+            --light-color: #f5f5f5;
+            --dark-color: #212121;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000428 0%, #004e92 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: #ffffff !important;
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            padding: 12px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+        }
+
+        .navbar-logo {
+            height: 45px !important;
+            max-width: 220px !important;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8));
+            transition: transform 0.4s ease;
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: #0066cc !important;
+            transition: all 0.3s ease;
+            padding: 6px 14px !important;
+            border-radius: 20px;
+        }
+
+        .nav-link:hover {
+            color: #004499 !important;
+            background: rgba(0, 102, 204, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* ── Hero ── */
+        .hero-section {
+            background: transparent;
+            color: #ffffff;
+            padding: 100px 0 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            min-height: 50vh;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #f9c74f;
+        }
+
+        .hero-glass-container {
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .hero-banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* ── Cards ── */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), #0056b3);
+            color: white;
+            font-weight: 600;
+            border: none;
+        }
+
+        /* ── Feature & Stat Cards ── */
+        .feature-card {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
+
+        /* ── Forms ── */
+        .form-control,
+        .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 12px 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            border-radius: 10px;
+            font-weight: 600;
+            padding: 12px 25px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1a237e, #3f51b5);
+            box-shadow: 0 4px 15px rgba(26, 35, 126, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 35, 126, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #1e7e34);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning-color), #e0a800);
+        }
+
+        /* ── Complaint Cards ── */
+        .complaint-card {
+            border-left: 4px solid var(--primary-color);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .complaint-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .complaint-card.pending {
+            border-left-color: var(--warning-color);
+        }
+
+        .complaint-card.in_progress {
+            border-left-color: var(--info-color);
+        }
+
+        .complaint-card.resolved {
+            border-left-color: var(--success-color);
+        }
+
+        .complaint-card.deleted {
+            border-left-color: #6c757d;
+            opacity: 0.75;
+            background-color: #f8f9fa;
+        }
+
+        /* ── Complaint Card Top Info Strip ── */
+        .complaint-meta-strip {
+            background: #f8fafc;
+            border-bottom: 1px solid #e9ecef;
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .complaint-meta-strip .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            color: #64748b;
+        }
+
+        .complaint-meta-strip .meta-item i {
+            font-size: 0.75rem;
+        }
+
+        .complaint-meta-strip .meta-divider {
+            color: #cbd5e0;
+        }
+
+        /* ── Assign Info Banner (shown after admin assigns) ── */
+        .assign-info-banner {
+            background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+            border: 1px solid #a5d6a7;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: 0.85rem;
+        }
+
+        .assign-info-banner .aib-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #2e7d32;
+        }
+
+        .assign-info-banner .aib-item i {
+            color: #43a047;
+            font-size: 0.8rem;
+        }
+
+        .assign-info-banner .aib-item strong {
+            color: #1b5e20;
+        }
+
+        .complaint-images {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            scrollbar-width: thin;
+        }
+
+        .complaint-image-thumb {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 2px solid #e9ecef;
+        }
+
+        .complaint-image-thumb:hover {
+            transform: scale(1.08);
+        }
+
+        /* ── Status & Priority Badges ── */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffc107;
+        }
+
+        .status-in_progress {
+            background: #cce5ff;
+            color: #004085;
+            border: 1px solid #0288d1;
+        }
+
+        .status-resolved {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #00897b;
+        }
+
+        .status-deleted {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .priority-low {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        .priority-medium {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .priority-high {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .priority-urgent {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .dept-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background: #e8eaf6;
+            color: #1a237e;
+        }
+
+        .edited-badge {
+            background: #fff3cd;
+            color: #856404;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            margin-left: 8px;
+            border: 1px solid #ffeeba;
+        }
+
+        /* ── Action Buttons on Complaint Card ── */
+        .complaint-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-edit-c {
+            background: #e3f2fd;
+            color: #0277bd;
+            border: 1px solid #90caf9;
+        }
+
+        .btn-edit-c:hover {
+            background: #0277bd;
+            color: #fff;
+        }
+
+        .btn-delete-c {
+            background: #fce4ec;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        .btn-delete-c:hover {
+            background: #c62828;
+            color: #fff;
+        }
+
+        .btn-feedback-c {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        .btn-feedback-c:hover {
+            background: #2e7d32;
+            color: #fff;
+        }
+
+        /* ── Image Upload ── */
+        .image-upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--primary-color);
+            background: #f8f9fa;
+        }
+
+        .image-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .image-preview-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        /* ── Modals ── */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), #0056b3);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            border: none;
+        }
+
+        .modal-footer {
+            border-top: none;
+        }
+
+        /* ── Notifications ── */
+        .notification-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--info-color);
+        }
+
+        .notification-item.unread {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left-color: var(--primary-color);
+        }
+
+        /* ── Profile ── */
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        /* ── Empty & Spinner ── */
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* ── Complaint form field labels ── */
+        .form-section-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .form-field-group {
+            margin-bottom: 1.25rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* ── Chatbot UI ── */
+        .chatbot-toggler {
+            position: fixed;
+            bottom: 30px;
+            right: 35px;
+            height: 60px;
+            width: 60px;
+            color: #fff;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            outline: none;
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1050;
+        }
+
+        .chatbot-toggler:hover {
+            transform: scale(1.1);
+        }
+
+        .chatbot-toggler span {
+            position: absolute;
+        }
+
+        .chatbot-toggler span:last-child {
+            opacity: 0;
+        }
+
+        body.show-chatbot .chatbot-toggler {
+            transform: rotate(90deg);
+        }
+
+        body.show-chatbot .chatbot-toggler span:first-child {
+            opacity: 0;
+        }
+
+        body.show-chatbot .chatbot-toggler span:last-child {
+            opacity: 1;
+        }
+
+        .chatbot {
+            position: fixed;
+            right: 35px;
+            bottom: 100px;
+            width: 380px;
+            background: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.5);
+            transform-origin: bottom right;
+            transition: all 0.1s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1050;
+        }
+
+        body.show-chatbot .chatbot {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+        }
+
+        .chatbot header {
+            padding: 15px 0;
+            text-align: center;
+            background: linear-gradient(135deg, #2e7d32, #1b5e20);
+            position: relative;
+            color: #fff;
+        }
+
+        .chatbot header h5 {
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .chatbot header .status-dot {
+            height: 10px;
+            width: 10px;
+            background: #4caf50;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            border: 2px solid #fff;
+        }
+
+        .chatbot .chatbox {
+            overflow-y: auto;
+            height: 400px;
+            padding: 15px 20px 70px;
+            background: #f8f9fa;
+        }
+
+        .chatbox .chat {
+            display: flex;
+            list-style: none;
+        }
+
+        .chatbox .outgoing {
+            margin: 15px 0;
+            justify-content: flex-end;
+        }
+
+        .chatbox .incoming span {
+            width: 32px;
+            height: 32px;
+            color: #fff;
+            background: #2e7d32;
+            border-radius: 4px;
+            text-align: center;
+            line-height: 32px;
+            align-self: flex-end;
+            margin-right: 10px;
+            font-size: 0.8rem;
+        }
+
+        .chatbox .chat p {
+            white-space: pre-wrap;
+            padding: 12px 16px;
+            border-radius: 10px 10px 0 10px;
+            max-width: 75%;
+            color: #fff;
+            font-size: 0.9rem;
+            background: #2e7d32;
+        }
+
+        .chatbox .incoming p {
+            border-radius: 10px 10px 10px 0;
+            color: #000;
+            background: #e9ecef;
+        }
+
+        .chatbot .chat-input {
+            display: flex;
+            gap: 5px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: #fff;
+            padding: 10px 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input textarea {
+            height: 40px;
+            width: 100%;
+            border: none;
+            outline: none;
+            resize: none;
+            max-height: 100px;
+            padding: 10px 0;
+            font-size: 0.95rem;
+        }
+
+        .chat-input span {
+            color: #1a237e;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.2s;
+        }
+
+        .chat-input span:hover {
+            color: #0d47a1;
+        }
+
+        .voice-btn {
+            margin-right: 10px;
+        }
+
+        /* Voice animation */
+        .listening {
+            color: #d32f2f !important;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Tracking Card Styles */
+        .tracking-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            color: #333;
+            width: 100%;
+        }
+
+        .tracking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .tracking-id {
+            font-weight: 700;
+            color: #1a237e;
+            font-size: 0.9rem;
+        }
+
+        .tracking-status-label {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .tracking-stepper {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-top: 20px;
+            padding-bottom: 10px;
+        }
+
+        .tracking-stepper::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #eee;
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+        }
+
+        .step-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #eee;
+            border: 2px solid #fff;
+            margin-bottom: 5px;
+            box-shadow: 0 0 0 2px #eee;
+        }
+
+        .step.active .step-dot {
+            background: #2e7d32;
+            box-shadow: 0 0 0 2px #2e7d32;
+        }
+
+        .step.completed .step-dot {
+            background: #4caf50;
+            box-shadow: 0 0 0 2px #4caf50;
+        }
+
+        .step-label {
+            font-size: 0.6rem;
+            color: #666;
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: #2e7d32;
+            font-weight: 700;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ── Navigation ── -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#home" style="padding: 4px 0;">
+                <img src="jansamadhan-green.jpg" alt="JAN SAMADHAN" class="navbar-logo"
+                    onmouseover="this.style.transform='scale(1.05) rotate(2deg)';"
+                    onmouseout="this.style.transform='scale(1) rotate(0deg)';">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse ps-lg-4" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home"><i class="fas fa-home me-1"></i> Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#create-complaint" id="createComplaintLink" style="display:none;">
+                            <i class="fas fa-plus-circle me-1"></i> Create Complaint
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#complaints" id="complaintsLink" style="display:none;">
+                            <i class="fas fa-list-alt me-1"></i> My Complaints
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#profile" id="profileNavLink" style="display:none;">
+                            <i class="fas fa-user-circle me-1"></i> My Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact"><i class="fas fa-envelope me-1"></i> Contact Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#feedback-page"><i class="fas fa-comment-alt me-1"></i> Feedback</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#login" id="loginLink">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#register" id="registerLink">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#logout" onclick="handleLogout(); return false;" id="logoutLink" style="display:none;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── Home ── -->
+    <section id="home" class="hero-section content-section">
+        <div class="container hero-content">
+            <div class="row align-items-center">
+                <div class="col-lg-6 text-start mb-5 mb-lg-0">
+                    <h1 class="hero-title"></h1>
+                    <h2 class="hero-subtitle">आपकी समस्या, हमारा समाधान</h2>
+                    <div class="d-flex flex-wrap gap-3">
+                        <button class="btn rounded-pill px-4 py-2" onclick="showSection('register')"
+                            style="background: linear-gradient(90deg, #0061ff, #60efff); color: white; font-weight: 600; box-shadow: 0 4px 20px rgba(0,97,255,0.5); border: none;">
+                            <i class="fas fa-user-plus me-2"></i> Register Now
+                        </button>
+                        <button class="btn rounded-pill px-4 py-2" onclick="showSection('login')"
+                            style="background-color: transparent; color: #ffffff; font-weight: 600; border: 2px solid rgba(255,255,255,0.6);">
+                            <i class="fas fa-sign-in-alt me-2"></i> Login Member
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-flex justify-content-center justify-content-lg-end">
+                    <div class="hero-glass-container">
+                        <img src="modi-banner.png" alt="JAN SAMADHAN Leadership" class="hero-banner-img shadow-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Login ── -->
+    <section id="login" class="py-5 content-section" style="display:none;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h4><i class="fas fa-sign-in-alt me-2"></i>Login to Your Account</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="loginForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-control" id="loginUsername" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="loginPassword" required>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="rememberMe">
+                                    <label class="form-check-label" for="rememberMe">Remember me</label>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100" id="loginBtn">
+                                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                                </button>
+                            </form>
+                            <div class="text-center mt-3">
+                                <p>Don't have an account? <a href="#" onclick="showSection('register')">Register
+                                        here</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Register ── -->
+    <section id="register" class="py-5 content-section" style="display:none;">
+        <div class="container">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-md-6">
+                    <div class="card shadow-lg bg-dark text-white border-0"
+                        style="border-radius: 20px; background: rgba(30,30,50,0.8) !important; backdrop-filter: blur(10px);">
+                        <div class="card-header text-center border-0 pt-4">
+                            <h4 class="fw-bold"><i class="fas fa-user-plus me-2 text-primary"></i>Create Your Account
+                            </h4>
+                        </div>
+                        <div class="card-body p-4">
+                            <form id="registerForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-white-50">Username</label>
+                                            <input type="text" class="form-control bg-dark text-white border-secondary"
+                                                id="registerUsername" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-white-50">Email</label>
+                                            <input type="email" class="form-control bg-dark text-white border-secondary"
+                                                id="registerEmail" placeholder="example@domain.com" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-white-50">Full Name</label>
+                                    <input type="text" class="form-control bg-dark text-white border-secondary"
+                                        id="registerFullName" required>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-white-50">Password (min 8 characters)</label>
+                                            <input type="password"
+                                                class="form-control bg-dark text-white border-secondary"
+                                                id="registerPassword" placeholder="Minimum 8 characters" minlength="8" maxlength="50" required>
+                                            <small class="text-warning d-block mt-1">Password must be at least 8 characters</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-white-50">Confirm Password</label>
+                                            <input type="password"
+                                                class="form-control bg-dark text-white border-secondary"
+                                                id="confirmPassword" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-white-50">Phone Number (10 digits)</label>
+                                            <input type="tel" class="form-control bg-dark text-white border-secondary"
+                                                id="registerPhone" placeholder="10 digit number" inputmode="numeric" pattern="[0-9]{10}" maxlength="10" required>
+                                            <small class="text-warning d-block mt-1">Phone must be exactly 10 digits</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label class="form-label text-white-50">Address</label>
+                                            <input type="text" class="form-control bg-dark text-white border-secondary"
+                                                id="registerAddress">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn rounded-pill w-100 py-2 mt-3 fw-bold" id="registerBtn"
+                                    style="background: linear-gradient(90deg, #0061ff, #60efff); border: none; color: white;">
+                                    <i class="fas fa-user-plus me-2"></i>Create Account
+                                </button>
+                            </form>
+                            <div class="text-center mt-3">
+                                <p class="text-white-50">Already have an account? <a href="#"
+                                        class="text-primary fw-bold" onclick="showSection('login')">Login here</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 d-none d-lg-flex justify-content-center">
+                    <div class="hero-glass-container">
+                        <img src="modi-banner.png" alt="JAN SAMADHAN Leadership" class="hero-banner-img shadow-lg">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Create Complaint ── -->
+    <section id="create-complaint" class="py-5 content-section" style="display:none;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-9">
+                    <div class="card shadow-lg">
+                        <div class="card-header p-4">
+                            <h3 class="mb-1" id="createComplaintHeaderTitle">
+                                <i class="fas fa-file-signature me-2"></i>Submit a New Complaint
+                            </h3>
+                            <p class="mb-0 text-white-50 small" id="createComplaintHeaderSubtitle">
+                                Provide details about the issue you are facing
+                            </p>
+                        </div>
+                        <div class="card-body p-4">
+                            <form id="complaintPageForm">
+                                <input type="hidden" id="editingComplaintId" value="">
+
+                                <!-- Complaint Name -->
+                                <div class="form-field-group">
+                                    <div class="form-section-label"><i class="fas fa-tag me-1"></i> Complaint Name *
+                                    </div>
+                                    <input type="text" class="form-control form-control-lg" id="pageComplaintTitle"
+                                        placeholder="e.g. Water pipe leakage near Main Road" required>
+                                </div>
+
+                                <!-- Detailed Description -->
+                                <div class="form-field-group">
+                                    <div class="form-section-label"><i class="fas fa-align-left me-1"></i> Detailed
+                                        Description *</div>
+                                    <textarea class="form-control" id="pageComplaintDescription" rows="5"
+                                        placeholder="Please describe the issue in detail — when it started, how severe it is, and any other relevant information..."
+                                        required></textarea>
+                                </div>
+
+                                <!-- Department + Priority -->
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <div class="form-section-label"><i class="fas fa-building me-1"></i> Department
+                                            *</div>
+                                        <select class="form-select" id="pageComplaintCategory" required>
+                                            <option value="">-- Select Department --</option>
+                                            <option value="Water Supply">💧 Water Department</option>
+                                            <option value="Street Light">💡 Street Light Department</option>
+                                            <option value="Road Department">🛣️ Road Department</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-section-label"><i class="fas fa-exclamation-circle me-1"></i>
+                                            Priority Level</div>
+                                        <select class="form-select" id="pageComplaintPriority">
+                                            <option value="low">🟢 Low</option>
+                                            <option value="medium" selected>🔵 Medium</option>
+                                            <option value="high">🟡 High</option>
+                                            <option value="urgent">🔴 Urgent</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Address / Location -->
+                                <div class="form-field-group">
+                                    <div class="form-section-label"><i class="fas fa-map-marker-alt me-1"></i> Address /
+                                        Landmark Details</div>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="pageComplaintLocation"
+                                            placeholder="Street address, landmark, or area name">
+                                        <button class="btn btn-outline-primary" type="button" onclick="openMapPicker()">
+                                            <i class="fas fa-map me-1"></i> Get Location
+                                        </button>
+                                    </div>
+                                    <small class="text-muted mt-1 d-block">
+                                        <i class="fas fa-info-circle me-1"></i> Click "Get Location" to pick your exact
+                                        address on the map.
+                                    </small>
+                                </div>
+
+                                <!-- Upload Photos -->
+                                <div class="form-field-group">
+                                    <div class="form-section-label"><i class="fas fa-camera me-1"></i> Upload Photos
+                                        (Optional)</div>
+                                    <div class="image-upload-area"
+                                        onclick="document.getElementById('pageImageUpload').click()">
+                                        <i class="fas fa-camera fa-3x text-primary mb-3"></i>
+                                        <h5 class="text-muted">Drop photos here or click to upload</h5>
+                                        <p class="text-muted small mb-0">Up to 5 images (max 5MB each)</p>
+                                    </div>
+                                    <input type="file" id="pageImageUpload" multiple accept="image/*"
+                                        style="display: none;">
+                                    <div class="image-preview mt-3" id="pageImagePreview"></div>
+                                </div>
+
+                                <hr class="my-4">
+                                <div class="d-grid gap-2">
+                                    <button type="button" class="btn btn-primary btn-lg" id="submitComplaintBtn"
+                                        onclick="submitComplaintFromPage()">
+                                        <i class="fas fa-paper-plane me-2"></i>Submit Your Complaint
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="cancelEditBtn"
+                                        onclick="cancelEdit()" style="display:none;">
+                                        <i class="fas fa-times me-2"></i>Cancel Edit
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Profile ── -->
+    <section id="profile" class="py-5 content-section" style="display:none;">
+        <div class="container d-flex justify-content-center">
+            <div class="col-lg-5 col-md-7">
+                <div class="card border-0 shadow-sm"
+                    style="border-radius: 12px; border-top: 4px solid #00C9FF !important;">
+                    <div class="card-body p-3 p-md-4">
+                        <div class="d-flex flex-column align-items-center mb-3 text-center">
+                            <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                                style="width: 80px; height: 80px; font-size: 2rem; color: #00C9FF;">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <h4 class="mb-1" id="profileUsernameMain">Username</h4>
+                            <p class="text-muted mb-2" id="profileEmailMain">email@example.com</p>
+                            <button class="btn btn-primary text-white px-4 rounded-pill py-1 fw-bold"
+                                id="editProfileBtn" onclick="editProfile()">
+                                <i class="fas fa-edit me-2"></i>Edit My Profile
+                            </button>
+                        </div>
+                        <hr>
+                        <form id="profileForm">
+                            <div class="mb-3">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control bg-light border-0" id="profileFullName" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-control bg-light border-0" id="profileUsernameEdit"
+                                    readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control bg-light border-0" id="profileEmailEdit"
+                                    readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control bg-light border-0" id="profilePhone" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <input type="text" class="form-control bg-light border-0" id="profileAddress" readonly>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Complaints List ── -->
+    <section id="complaints" class="py-5 content-section" style="display:none;">
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="text-white fw-bold">
+                            <i class="fas fa-list-alt me-2"></i>My Complaints
+                        </h3>
+                    </div>
+                    <div id="complaintsList" class="row">
+                        <!-- Complaints will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Contact Us ── -->
+    <section id="contact" class="py-5 content-section" style="display:none;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow-lg">
+                        <div class="card-header text-center">
+                            <h4><i class="fas fa-envelope me-2"></i>Contact Us</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="contactForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Your Name *</label>
+                                    <input type="text" class="form-control" id="contactName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Category *</label>
+                                    <select class="form-select" id="contactCategory" required>
+                                        <option value="">-- Select Category --</option>
+                                        <option value="General Inquiry">General Inquiry</option>
+                                        <option value="Technical Support">Technical Support</option>
+                                        <option value="Complaint Status">Complaint Status</option>
+                                        <option value="Feedback">Feedback</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Message *</label>
+                                    <textarea class="form-control" id="contactMessage" rows="5" required
+                                        placeholder="Please describe your message in detail..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-paper-plane me-2"></i>Send Message
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Feedback Page ── -->
+    <section id="feedback-page" class="py-5 content-section" style="display:none;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow-lg">
+                        <div class="card-header text-center">
+                            <h4><i class="fas fa-comment-alt me-2"></i>Share Your Feedback</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="generalFeedbackForm">
+                                <div class="mb-4 text-center">
+                                    <label class="form-label d-block mb-3">Rate Your Experience</label>
+                                    <div id="generalStarRating" class="d-flex justify-content-center gap-2">
+                                        <i class="far fa-star fa-2x text-warning" style="cursor: pointer;"
+                                            data-rating="1"></i>
+                                        <i class="far fa-star fa-2x text-warning" style="cursor: pointer;"
+                                            data-rating="2"></i>
+                                        <i class="far fa-star fa-2x text-warning" style="cursor: pointer;"
+                                            data-rating="3"></i>
+                                        <i class="far fa-star fa-2x text-warning" style="cursor: pointer;"
+                                            data-rating="4"></i>
+                                        <i class="far fa-star fa-2x text-warning" style="cursor: pointer;"
+                                            data-rating="5"></i>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Your Feedback *</label>
+                                    <textarea class="form-control" id="generalFeedbackComment" rows="5" required
+                                        placeholder="Please share your experience with JAN SAMADHAN..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-paper-plane me-2"></i>Submit Feedback
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── Feedback Modal ── -->
+    <div class="modal fade" id="feedbackModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-star me-2"></i>Rate Your Experience</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <div id="starRating" class="d-flex justify-content-center gap-2">
+                            <i class="far fa-star fa-2x text-warning" style="cursor: pointer;" data-rating="1"></i>
+                            <i class="far fa-star fa-2x text-warning" style="cursor: pointer;" data-rating="2"></i>
+                            <i class="far fa-star fa-2x text-warning" style="cursor: pointer;" data-rating="3"></i>
+                            <i class="far fa-star fa-2x text-warning" style="cursor: pointer;" data-rating="4"></i>
+                            <i class="far fa-star fa-2x text-warning" style="cursor: pointer;" data-rating="5"></i>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Your Feedback *</label>
+                        <textarea class="form-control" id="feedbackComment" rows="4" required
+                            placeholder="Please share your experience with this complaint resolution..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="submitFeedbackBtn">
+                        <i class="fas fa-paper-plane me-2"></i>Submit Feedback
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Map Picker Modal ── -->
+    <div class="modal fade" id="mapPickerModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-map me-2"></i>Select Location</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalMap" style="height: 400px; border-radius: 8px;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="confirmMapSelection()">
+                        <i class="fas fa-check me-2"></i>Use This Location
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // ── Global Variables ──
+        const API_BASE_URL = 'http://127.0.0.1:8000/api';
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        let pageUploadedImages = [];
+        let uploadedImages = [];
+        let selectedRating = 0;
+        let currentComplaintId = null;
+        let currentComplaintIdForFeedback = null;
+        let leafMap = null;
+        let leafMarker = null;
+        let autoRefreshInterval = null;
+
+        // ── Initialization ──
+        document.addEventListener('DOMContentLoaded', () => {
+            initChatbot(); // Initialize chatbot
+            checkAuthStatus();
+            setupEventListeners();
+            startAutoRefresh();
+        });
+
+        // ── Authentication ──
+        function checkAuthStatus() {
+            if (authToken && currentUser) {
+                showAuthenticatedView();
+                loadUserDashboard();
+                loadUserComplaints();
+                loadUserProfile();
+                loadUserNotifications();
+            } else {
+                showUnauthenticatedView();
+            }
+        }
+
+        function showAuthenticatedView() {
+            document.getElementById('loginLink').style.display = 'none';
+            document.getElementById('registerLink').style.display = 'none';
+            document.getElementById('logoutLink').style.display = 'block';
+            document.getElementById('createComplaintLink').style.display = 'block';
+            document.getElementById('complaintsLink').style.display = 'block';
+            document.getElementById('profileNavLink').style.display = 'block';
+        }
+
+        function showUnauthenticatedView() {
+            document.getElementById('loginLink').style.display = 'block';
+            document.getElementById('registerLink').style.display = 'block';
+            document.getElementById('logoutLink').style.display = 'none';
+            document.getElementById('createComplaintLink').style.display = 'none';
+            document.getElementById('complaintsLink').style.display = 'none';
+            document.getElementById('profileNavLink').style.display = 'none';
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            if (!username || !password) return;
+            setButtonLoading('loginBtn', true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await res.json();
+                if (res.ok && data.access_token) {
+                    authToken = data.access_token;
+                    currentUser = data.user;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showNotification('Login successful!', 'success');
+                    showAuthenticatedView();
+                    showSection('complaints');
+                    loadUserDashboard();
+                    loadUserComplaints();
+                    loadUserProfile();
+                    loadUserNotifications();
+                } else {
+                    showNotification(data.error || 'Invalid credentials', 'danger');
+                }
+            } catch (err) {
+                showNotification('Network error. Please try again.', 'danger');
+            } finally {
+                setButtonLoading('loginBtn', false, '<i class="fas fa-sign-in-alt me-2"></i>Login');
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('registerUsername').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const fullName = document.getElementById('registerFullName').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const phone = document.getElementById('registerPhone').value.trim();
+            const address = document.getElementById('registerAddress').value.trim();
+            
+            // Validation checks
+            if (!username || !email || !fullName || !password || !phone) {
+                showNotification('Please fill all required fields', 'danger');
+                return;
+            }
+            
+            // Email validation with @
+            if (!email.includes('@')) {
+                showNotification('Email must contain @ symbol (e.g., user@example.com)', 'danger');
+                return;
+            }
+            
+            // Phone validation - exactly 10 digits
+            const phoneRegex = /^[0-9]{10}$/;
+            if (!phoneRegex.test(phone)) {
+                showNotification('Phone number must be exactly 10 digits', 'danger');
+                return;
+            }
+            
+            // Password length validation
+            if (password.length < 8) {
+                showNotification('Password must be at least 8 characters long', 'danger');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showNotification('Passwords do not match', 'danger');
+                return;
+            }
+            
+            setButtonLoading('registerBtn', true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, full_name: fullName, password, phone, address })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showNotification('Registration successful! Please login.', 'success');
+                    document.getElementById('registerForm').reset();
+                    showSection('login');
+                } else {
+                    showNotification(data.error || 'Registration failed', 'danger');
+                }
+            } catch (err) {
+                showNotification('Network error. Please try again.', 'danger');
+            } finally {
+                setButtonLoading('registerBtn', false, '<i class="fas fa-user-plus me-2"></i>Create Account');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            authToken = null;
+            currentUser = null;
+            showUnauthenticatedView();
+            showSection('home');
+            showNotification('Logged out successfully', 'info');
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+        }
+
+        // ── Navigation ──
+        function showSection(sectionId, updateHash = true) {
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                window.scrollTo(0, 0);
+            }
+            if (updateHash) {
+                const nextHash = `#${sectionId}`;
+                history.replaceState(null, '', nextHash);
+            }
+            if (sectionId === 'home' && authToken) {
+                loadHomeStats();
+            } else if (sectionId === 'complaints' && authToken) {
+                loadUserComplaints();
+            } else if (sectionId === 'profile' && authToken) {
+                loadUserProfile();
+            }
+        }
+
+        function syncSectionFromHash() {
+            const hash = window.location.hash.replace('#', '') || 'home';
+            showSection(hash, false);
+        }
+
+        window.addEventListener('hashchange', syncSectionFromHash);
+        document.addEventListener('DOMContentLoaded', syncSectionFromHash);
+
+        // ── Auto Refresh ──
+        function startAutoRefresh() {
+            if (authToken && currentUser?.id) {
+                autoRefreshInterval = setInterval(() => refreshCustomerData(), 5000);
+            }
+        }
+
+        async function refreshCustomerData() {
+            if (!authToken || !currentUser?.id) return;
+            const visible = Array.from(document.querySelectorAll('.content-section')).find(s => s.style.display !== 'none');
+            if (!visible) return;
+            if (visible.id === 'complaints') await loadUserComplaints();
+        }
+
+        // ── Stats ──
+        async function loadHomeStats() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/stats`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+                if (res.ok) {
+                    const s = await res.json();
+                    if (document.getElementById('totalStats')) document.getElementById('totalStats').textContent = s.total_complaints || 0;
+                    if (document.getElementById('resolvedStats')) document.getElementById('resolvedStats').textContent = s.resolved_complaints || 0;
+                    if (document.getElementById('usersStats')) document.getElementById('usersStats').textContent = s.active_users || 0;
+                }
+            } catch (e) { }
+        }
+
+        // ── Profile ──
+        async function loadUserProfile() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/user/profile`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+                if (res.ok) {
+                    const { user } = await res.json();
+                    if (document.getElementById('profileUsernameMain')) document.getElementById('profileUsernameMain').textContent = user.username || '';
+                    if (document.getElementById('profileEmailMain')) document.getElementById('profileEmailMain').textContent = user.email || '';
+                    if (document.getElementById('profileFullName')) document.getElementById('profileFullName').value = user.full_name || '';
+                    if (document.getElementById('profileUsernameEdit')) document.getElementById('profileUsernameEdit').value = user.username || '';
+                    if (document.getElementById('profileEmailEdit')) document.getElementById('profileEmailEdit').value = user.email || '';
+                    if (document.getElementById('profilePhone')) document.getElementById('profilePhone').value = user.phone || '';
+                    if (document.getElementById('profileAddress')) document.getElementById('profileAddress').value = user.address || '';
+                }
+            } catch (e) { }
+        }
+
+        function editProfile() {
+            const fields = ['profileFullName', 'profilePhone', 'profileAddress', 'profileUsernameEdit', 'profileEmailEdit'];
+            const btn = document.getElementById('editProfileBtn');
+            if (btn.textContent.includes('Edit')) {
+                fields.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) { el.removeAttribute('readonly'); el.classList.remove('bg-light', 'border-0'); el.style.border = '1px solid #ced4da'; }
+                });
+                btn.innerHTML = '<i class="fas fa-save me-2"></i>Save Changes';
+                btn.className = 'btn btn-success px-5 rounded-pill py-2';
+            } else { saveProfileChanges(); }
+        }
+
+        async function saveProfileChanges() {
+            setButtonLoading('editProfileBtn', true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/user/profile`, {
+                    method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                    body: JSON.stringify({
+                        full_name: document.getElementById('profileFullName').value,
+                        phone: document.getElementById('profilePhone').value,
+                        address: document.getElementById('profileAddress').value
+                    })
+                });
+                if (res.ok) {
+                    showNotification('Profile updated successfully', 'success');
+                    const fields = ['profileFullName', 'profilePhone', 'profileAddress', 'profileUsernameEdit', 'profileEmailEdit'];
+                    fields.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) { el.setAttribute('readonly', true); el.classList.add('bg-light', 'border-0'); el.style.border = 'none'; }
+                    });
+                    const btn = document.getElementById('editProfileBtn');
+                    btn.innerHTML = '<i class="fas fa-edit me-2"></i>Edit My Profile';
+                    btn.className = 'btn btn-primary text-white px-4 rounded-pill py-1 fw-bold';
+                }
+            } catch (e) { showNotification('Network error.', 'danger'); }
+            finally { setButtonLoading('editProfileBtn', false, '<i class="fas fa-edit me-2"></i>Edit My Profile'); }
+        }
+
+        // ── Load Complaints ──
+        async function loadUserComplaints() {
+            if (!authToken) return;
+            const list = document.getElementById('complaintsList');
+            if (!list) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/complaints`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+                if (res.ok) {
+                    const data = await res.json();
+                    displayComplaints(data.complaints);
+                } else if (res.status === 401) {
+                    localStorage.clear(); authToken = null; currentUser = null; checkAuthStatus();
+                }
+            } catch (e) {
+                list.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>Network error. Please check your connection.</div>`;
+            }
+        }
+
+        // ── Display Complaints ──
+        function displayComplaints(complaints) {
+            const list = document.getElementById('complaintsList');
+            if (!list) return;
+
+            if (!complaints.length) {
+                list.innerHTML = `
+                    <div class="empty-state text-white">
+                        <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                        <h4>No complaints yet</h4>
+                        <p class="mb-4">You haven't filed any complaints yet.</p>
+                        <button class="btn btn-primary rounded-pill px-4" onclick="showSection('create-complaint')">
+                            <i class="fas fa-plus me-2"></i>File Your First Complaint
+                        </button>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = complaints.map(c => {
+                const imgs = safeParseJSON(c.images);
+                const isEdited = c.updated_at && (new Date(c.updated_at) - new Date(c.created_at) > 1000);
+
+                // Assign info from admin (department, assigned_to, admin_notes)
+                const hasAssign = c.department_name || c.assigned_to || c.admin_notes;
+
+                return `
+                <div class="complaint-card ${c.status}">
+
+                    <!-- Meta strip: ID, created date, updated -->
+                    <div class="complaint-meta-strip">
+                        <span class="meta-item"><i class="fas fa-hashtag"></i><strong>#${c.id}</strong></span>
+                        <span class="meta-divider">|</span>
+                        <span class="meta-item"><i class="fas fa-calendar-plus"></i> Created: ${new Date(c.created_at).toLocaleString()}</span>
+                        ${isEdited ? `<span class="meta-divider">|</span><span class="meta-item text-warning"><i class="fas fa-pencil-alt"></i> Updated: ${new Date(c.updated_at).toLocaleString()}</span>` : ''}
+                        ${c.assigned_to ? `<span class="meta-divider">|</span><span class="meta-item"><i class="fas fa-user-check"></i> Assigned: ${sanitizeHTML(c.assigned_to)}</span>` : ''}
+                    </div>
+
+                    <div class="card-body p-3 p-md-4">
+                        <div class="row">
+                            <div class="col-md-9">
+
+                                <!-- Title -->
+                                <h5 class="fw-bold mb-2 text-dark">
+                                    ${sanitizeHTML(c.title)}
+                                    ${isEdited ? '<span class="edited-badge"><i class="fas fa-pencil-alt me-1"></i>EDITED</span>' : ''}
+                                    ${c.status === 'deleted' ? '<span class="badge bg-secondary ms-2 small">DELETED</span>' : ''}
+                                </h5>
+
+                                <!-- Description -->
+                                <p class="text-secondary mb-3" style="font-size:0.9rem;line-height:1.6;">
+                                    ${sanitizeHTML(c.description.substring(0, 200))}${c.description.length > 200 ? '...' : ''}
+                                </p>
+
+                                <!-- Badges row -->
+                                <div class="d-flex flex-wrap gap-2 mb-3">
+                                    <span class="dept-badge"><i class="fas fa-building me-1"></i>${sanitizeHTML(c.category)}</span>
+                                    <span class="priority-badge priority-${c.priority}"><i class="fas fa-flag me-1"></i>${c.priority}</span>
+                                    <span class="status-badge status-${c.status}">
+                                        <i class="fas fa-${c.status === 'resolved' ? 'check-circle' : c.status === 'in_progress' ? 'spinner' : 'clock'} me-1"></i>
+                                        ${c.status.replace('_', ' ')}
+                                    </span>
+                                </div>
+
+                                <!-- Location -->
+                                ${c.location ? `
+                                <p class="mb-2" style="font-size:0.85rem;">
+                                    <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.location)}"
+                                       target="_blank" class="text-decoration-none text-info">
+                                        <i class="fas fa-map-marker-alt me-1"></i>${sanitizeHTML(c.location)}
+                                        <i class="fas fa-external-link-alt ms-1" style="font-size:0.7rem;"></i>
+                                    </a>
+                                </p>` : ''}
+
+                                <!-- Admin Assignment Info Banner -->
+                                ${hasAssign ? `
+                                <div class="assign-info-banner">
+                                    <span style="font-size:0.8rem;font-weight:700;color:#1b5e20;width:100%;"><i class="fas fa-user-shield me-1"></i>Admin Assignment Details</span>
+                                    ${c.department_name ? `<span class="aib-item"><i class="fas fa-building"></i><span>Dept: <strong>${sanitizeHTML(c.department_name)}</strong></span></span>` : ''}
+                                    ${c.assigned_to ? `<span class="aib-item"><i class="fas fa-user-check"></i><span>Staff: <strong>${sanitizeHTML(c.assigned_to)}</strong></span></span>` : ''}
+                                    ${c.admin_notes ? `<span class="aib-item"><i class="fas fa-sticky-note"></i><span>Notes: <strong>${sanitizeHTML(c.admin_notes)}</strong></span></span>` : ''}
+                                </div>` : ''}
+
+                                <!-- Images -->
+                                ${imgs.length ? `
+                                <div class="complaint-images mt-3">
+                                    ${imgs.map(img => `
+                                        <img src="${img.dataUrl}" class="complaint-image-thumb"
+                                            onclick="viewFullImage('${img.dataUrl}')" alt="Photo">
+                                    `).join('')}
+                                </div>` : ''}
+
+                                <!-- Action Buttons -->
+                                <div class="complaint-actions">
+                                    ${c.status === 'pending' ? `
+                                        <button class="btn-action btn-edit-c" onclick="enableEditMode(${c.id})">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button class="btn-action btn-delete-c" onclick="deleteComplaint(${c.id})">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    ` : ''}
+                                    ${c.status === 'in_progress' ? `
+                                        <span style="font-size:0.82rem;color:#0277bd;font-weight:600;">
+                                            <i class="fas fa-spinner fa-spin me-1"></i> Being processed by admin
+                                        </span>
+                                    ` : ''}
+                                    ${c.status === 'resolved' ? `
+                                        <button class="btn-action btn-feedback-c" onclick="showFeedbackModal(${c.id})">
+                                            <i class="fas fa-star"></i> Give Feedback
+                                        </button>
+                                        <span style="font-size:0.82rem;color:#2e7d32;font-weight:600;">
+                                            <i class="fas fa-check-circle me-1"></i> Resolved
+                                        </span>
+                                    ` : ''}
+                                    ${c.status === 'deleted' ? `
+                                        <span style="font-size:0.82rem;color:#6c757d;font-weight:600;">
+                                            <i class="fas fa-trash-alt me-1"></i> This complaint was deleted
+                                        </span>
+                                    ` : ''}
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ── Complaint CRUD ──
+        async function submitComplaintFromPage() {
+            const title = document.getElementById('pageComplaintTitle').value.trim();
+            const description = document.getElementById('pageComplaintDescription').value.trim();
+            const category = document.getElementById('pageComplaintCategory').value;
+            const priority = document.getElementById('pageComplaintPriority').value;
+            const location = document.getElementById('pageComplaintLocation').value.trim();
+            const editId = document.getElementById('editingComplaintId').value;
+            const isUpdate = editId !== '';
+
+            if (!title || !description || !category) {
+                showNotification('Please fill all required fields', 'danger'); return;
+            }
+            setButtonLoading('submitComplaintBtn', true);
+            try {
+                const res = await fetch(isUpdate ? `${API_BASE_URL}/complaints/${editId}` : `${API_BASE_URL}/complaints`, {
+                    method: isUpdate ? 'PUT' : 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                    body: JSON.stringify({ title, description, category, priority, location, images: pageUploadedImages })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showNotification(isUpdate ? 'Complaint updated successfully!' : 'Complaint submitted successfully!', 'success');
+                    resetComplaintForm();
+                    setTimeout(() => showSection('complaints'), 500);
+                } else {
+                    showNotification(data.error || 'Failed to submit complaint', 'danger');
+                }
+            } catch (e) { showNotification('Network error. Please try again.', 'danger'); }
+            finally { setButtonLoading('submitComplaintBtn', false, '<i class="fas fa-paper-plane me-2"></i>Submit Your Complaint'); }
+        }
+
+        async function enableEditMode(complaintId) {
+            try {
+                const res = await fetch(`${API_BASE_URL}/complaints`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+                const data = await res.json();
+                const c = data.complaints.find(x => x.id == complaintId);
+                if (!c) return;
+
+                document.getElementById('editingComplaintId').value = c.id;
+                document.getElementById('pageComplaintTitle').value = c.title;
+                document.getElementById('pageComplaintDescription').value = c.description;
+                document.getElementById('pageComplaintCategory').value = c.category;
+                document.getElementById('pageComplaintPriority').value = c.priority;
+                document.getElementById('pageComplaintLocation').value = c.location || '';
+
+                if (c.images) { pageUploadedImages = JSON.parse(c.images); updateImagePreviewGeneral('pageImagePreview', pageUploadedImages); }
+
+                document.getElementById('createComplaintHeaderTitle').innerHTML = '<i class="fas fa-edit me-2"></i>Update Your Complaint';
+                document.getElementById('createComplaintHeaderSubtitle').textContent = 'Review and modify your existing complaint details';
+                document.getElementById('submitComplaintBtn').innerHTML = '<i class="fas fa-save me-2"></i>Update Complaint';
+                document.getElementById('cancelEditBtn').style.display = 'block';
+
+                showSection('create-complaint');
+                window.scrollTo(0, 0);
+            } catch (e) { showNotification('Failed to load complaint details', 'danger'); }
+        }
+
+        function cancelEdit() {
+            resetComplaintForm();
+            showSection('complaints');
+        }
+
+        function resetComplaintForm() {
+            document.getElementById('complaintPageForm').reset();
+            document.getElementById('editingComplaintId').value = '';
+            document.getElementById('createComplaintHeaderTitle').innerHTML = '<i class="fas fa-file-signature me-2"></i>Submit a New Complaint';
+            document.getElementById('createComplaintHeaderSubtitle').textContent = 'Provide details about the issue you are facing';
+            document.getElementById('submitComplaintBtn').innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Your Complaint';
+            document.getElementById('cancelEditBtn').style.display = 'none';
+            pageUploadedImages = [];
+            updateImagePreviewGeneral('pageImagePreview', pageUploadedImages);
+        }
+
+        async function deleteComplaint(id) {
+            if (!confirm('Are you sure you want to delete this complaint? This cannot be undone.')) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/complaints/${id}`, {
+                    method: 'DELETE', headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                if (res.ok) { showNotification('Complaint deleted successfully', 'success'); loadUserComplaints(); }
+                else { const d = await res.json(); showNotification(d.error || 'Failed to delete', 'danger'); }
+            } catch (e) { showNotification('Network error.', 'danger'); }
+        }
+
+        // ── Feedback ──
+        function showFeedbackModal(complaintId) {
+            currentComplaintIdForFeedback = complaintId;
+            currentComplaintId = complaintId;
+            selectedRating = 0;
+            updateStarRating(0);
+            document.getElementById('feedbackComment').value = '';
+            new bootstrap.Modal(document.getElementById('feedbackModal')).show();
+        }
+
+        function updateStarRating(rating) {
+            document.querySelectorAll('#starRating i').forEach((s, i) => {
+                s.classList.toggle('text-warning', i < rating);
+                s.classList.toggle('text-muted', i >= rating);
+            });
+        }
+
+        async function submitFeedback() {
+            const comment = document.getElementById('feedbackComment').value.trim();
+            if (!selectedRating) { showNotification('Please select a rating', 'warning'); return; }
+            if (comment.length < 10) { showNotification('Comment must be at least 10 characters', 'warning'); return; }
+            setButtonLoading('submitFeedbackBtn', true);
+            try {
+                const res = await fetch(`${API_BASE_URL}/feedback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                    body: JSON.stringify({ complaint_id: currentComplaintId, rating: selectedRating, comment })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    showNotification('Feedback submitted successfully!', 'success');
+                    const m = bootstrap.Modal.getInstance(document.getElementById('feedbackModal'));
+                    if (m) m.hide();
+                    loadUserComplaints();
+                } else { showNotification(data.error || 'Failed to submit feedback', 'danger'); }
+            } catch (e) { showNotification('Network error.', 'danger'); }
+            finally { setButtonLoading('submitFeedbackBtn', false, '<i class="fas fa-paper-plane me-2"></i>Submit Feedback'); }
+        }
+
+        // ── Image Upload ──
+        function handleImageUploadGeneral(e, previewId, storageVarName) {
+            const files = Array.from(e.target.files);
+            const store = storageVarName === 'pageUploadedImages' ? pageUploadedImages : uploadedImages;
+            if (store.length + files.length > 5) { showNotification('Maximum 5 images allowed', 'warning'); return; }
+            files.forEach(file => {
+                if (file.size > 5 * 1024 * 1024) { showNotification(`${file.name} is too large (max 5MB)`, 'warning'); return; }
+                const reader = new FileReader();
+                reader.onload = e2 => { store.push({ name: file.name, dataUrl: e2.target.result, size: file.size }); updateImagePreviewGeneral(previewId, store); };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function updateImagePreviewGeneral(previewId, store) {
+            const preview = document.getElementById(previewId);
+            if (!preview) return;
+            preview.innerHTML = store.map((img, i) => `
+                <div class="image-preview-item">
+                    <img src="${img.dataUrl}" alt="${img.name}">
+                    <button type="button" class="remove-btn" onclick="removeImageGeneral('${previewId}', ${i})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>`).join('');
+        }
+
+        function removeImageGeneral(previewId, index) {
+            const store = previewId === 'pageImagePreview' ? pageUploadedImages : uploadedImages;
+            store.splice(index, 1);
+            updateImagePreviewGeneral(previewId, store);
+        }
+
+        function viewFullImage(dataUrl) {
+            const v = document.createElement('div');
+            v.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.92);display:flex;align-items:center;justify-content:center;z-index:9999;cursor:pointer;';
+            const img = document.createElement('img');
+            img.src = dataUrl;
+            img.style.cssText = 'max-width:90%;max-height:90%;border-radius:10px;box-shadow:0 0 40px rgba(0,0,0,0.5);';
+            v.appendChild(img);
+            v.onclick = () => document.body.removeChild(v);
+            document.body.appendChild(v);
+        }
+
+        // ── Map ──
+        function openMapPicker() {
+            const modal = new bootstrap.Modal(document.getElementById('mapPickerModal'));
+            modal.show();
+            document.getElementById('mapPickerModal').addEventListener('shown.bs.modal', () => {
+                if (!leafMap) {
+                    leafMap = L.map('modalMap').setView([20.5937, 78.9629], 5);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors',
+                        maxZoom: 19
+                    }).addTo(leafMap);
+                    leafMarker = L.marker([20.5937, 78.9629], { draggable: true }).addTo(leafMap);
+                    leafMap.on('click', e => leafMarker.setLatLng(e.latlng));
+                } else { leafMap.invalidateSize(); }
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(p => {
+                        leafMap.setView([p.coords.latitude, p.coords.longitude], 15);
+                        leafMarker.setLatLng([p.coords.latitude, p.coords.longitude]);
+                    }, error => {
+                        console.log('Geolocation error:', error);
+                        // Default to India center if geolocation fails
+                    });
+                }
+            }, { once: true });
+        }
+
+        async function confirmMapSelection() {
+            const { lat, lng } = leafMarker.getLatLng();
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`, {
+                    headers: {
+                        'User-Agent': 'JAN_SAMADHAN/1.0'
+                    }
+                });
+                const data = await res.json();
+                if (data && data.display_name) {
+                    document.getElementById('pageComplaintLocation').value = data.display_name;
+                } else {
+                    document.getElementById('pageComplaintLocation').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                }
+            } catch (e) {
+                console.log('Reverse geocoding error:', e);
+                document.getElementById('pageComplaintLocation').value = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            }
+            bootstrap.Modal.getInstance(document.getElementById('mapPickerModal')).hide();
+        }
+
+        // ── Notifications ──
+        async function loadUserNotifications() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/notifications`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+                if (res.ok) { const data = await res.json(); displayNotifications(data.notifications || []); }
+            } catch (e) { }
+        }
+
+        function displayNotifications(notifications) {
+            const el = document.getElementById('notificationsList');
+            if (!el) return;
+            if (!notifications.length) { el.innerHTML = '<p class="text-white-50 text-center">No notifications</p>'; return; }
+            el.innerHTML = notifications.slice(0, 10).map(n => `
+                <div class="notification-item ${n.is_read ? '' : 'unread'}">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h6 class="mb-1">${sanitizeHTML(n.title)}</h6>
+                            <p class="mb-1 small">${sanitizeHTML(n.message)}</p>
+                        </div>
+                        <span class="badge bg-primary">${n.type}</span>
+                    </div>
+                    <small class="text-muted">${new Date(n.created_at).toLocaleDateString()}</small>
+                </div>`).join('');
+        }
+
+        // ── Dashboard stats helper ──
+        async function loadUserDashboard() {
+            if (!authToken) return;
+            try {
+                const res = await fetch(`${API_BASE_URL}/complaints`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (document.getElementById('complaintTotalHeader')) document.getElementById('complaintTotalHeader').textContent = data.complaints.length;
+                    if (document.getElementById('complaintActiveHeader')) document.getElementById('complaintActiveHeader').textContent = data.complaints.filter(c => c.status === 'pending' || c.status === 'in_progress').length;
+                }
+            } catch (e) { }
+        }
+
+        // ── Utilities ──
+        function sanitizeHTML(str) {
+            if (!str) return '';
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        }
+
+        function safeParseJSON(json, fallback = []) {
+            try { return json ? JSON.parse(json) : fallback; } catch (e) { return fallback; }
+        }
+
+        function setButtonLoading(btnId, loading, defaultHTML = 'Submit') {
+            const btn = document.getElementById(btnId);
+            if (!btn) return;
+            if (loading) {
+                btn.disabled = true;
+                btn.dataset.orig = btn.innerHTML;
+                btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status"></span>Processing...`;
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = btn.dataset.orig || defaultHTML;
+            }
+        }
+
+        function showNotification(message, type) {
+            const n = document.createElement('div');
+            n.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            n.style.cssText = 'top:20px;right:20px;z-index:9999;min-width:300px;max-width:420px;';
+            n.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+            document.body.appendChild(n);
+            setTimeout(() => { if (n.parentNode) n.parentNode.removeChild(n); }, 5000);
+        }
+
+        // ── Event Listeners ──
+        function setupEventListeners() {
+            document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
+            document.getElementById('registerForm')?.addEventListener('submit', handleRegister);
+            document.getElementById('pageImageUpload')?.addEventListener('change', e => handleImageUploadGeneral(e, 'pageImagePreview', 'pageUploadedImages'));
+
+            // Star ratings
+            document.querySelectorAll('#starRating i').forEach(s => {
+                s.addEventListener('click', function () { selectedRating = parseInt(this.dataset.rating); updateStarRating(selectedRating); });
+            });
+            document.querySelectorAll('#generalStarRating i').forEach(s => {
+                s.addEventListener('mouseenter', function () { updateGeneralStars(parseInt(this.dataset.rating)); });
+                s.addEventListener('click', function () { updateGeneralStars(parseInt(this.dataset.rating)); });
+            });
+
+            // Contact form
+            document.getElementById('contactForm')?.addEventListener('submit', async e => {
+                e.preventDefault();
+                try {
+                    const res = await fetch(`${API_BASE_URL}/contact`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            name: document.getElementById('contactName').value,
+                            category: document.getElementById('contactCategory').value,
+                            message: document.getElementById('contactMessage').value,
+                            email: currentUser?.email || ''
+                        })
+                    });
+                    if (res.ok) { showNotification('Message sent! We will get back to you soon.', 'success'); e.target.reset(); }
+                    else showNotification('Failed to send message.', 'danger');
+                } catch (err) { showNotification('Network error.', 'danger'); }
+            });
+
+            // General feedback form
+            document.getElementById('generalFeedbackForm')?.addEventListener('submit', async e => {
+                e.preventDefault();
+                const stars = document.querySelectorAll('#generalStarRating i');
+                let rating = 0;
+                stars.forEach((s, i) => { if (s.classList.contains('fas')) rating = i + 1; });
+                const comment = document.getElementById('generalFeedbackComment').value.trim();
+                if (!rating) { showNotification('Please select a rating', 'warning'); return; }
+                if (comment.length < 5) { showNotification('Please share a comment (at least 5 characters)', 'warning'); return; }
+                try {
+                    const res = await fetch(`${API_BASE_URL}/feedback`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                        body: JSON.stringify({ complaint_id: null, rating, comment })
+                    });
+                    if (res.ok) { showNotification('Thank you for your valuable feedback!', 'success'); e.target.reset(); updateGeneralStars(0); }
+                    else showNotification('Failed to submit feedback.', 'danger');
+                } catch (err) { showNotification('Network error.', 'danger'); }
+            });
+        }
+
+        function updateGeneralStars(rating) {
+            document.querySelectorAll('#generalStarRating i').forEach((s, i) => {
+                s.classList.toggle('fas', i < rating);
+                s.classList.toggle('far', i >= rating);
+            });
+        }
+
+        // ── Chatbot Logic ──
+        let recognition;
+        let synth = window.speechSynthesis;
+
+        function initChatbot() {
+            console.log("Initializing chatbot...");
+            const chatbotToggler = document.querySelector(".chatbot-toggler");
+            const chatbox = document.querySelector(".chatbox");
+            const chatInput = document.querySelector(".chat-input textarea");
+            const sendChatBtn = document.querySelector("#send-btn");
+            const voiceBtn = document.querySelector("#voice-btn");
+
+            if (!chatbotToggler || !chatbox || !chatInput || !sendChatBtn) {
+                console.warn("Chatbot elements missing.");
+                return;
+            }
+
+            let hasGreeted = false;
+            chatbotToggler.addEventListener("click", () => {
+                const isOpening = !document.body.classList.contains("show-chatbot");
+                document.body.classList.toggle("show-chatbot");
+                if (isOpening && !hasGreeted) {
+                    speak("Hello! I am your Jan Samadhan Portal assistant. How can I help you today?");
+                    hasGreeted = true;
+                }
+            });
+
+            const createChatLi = (message, className) => {
+                const chatLi = document.createElement("li");
+                chatLi.classList.add("chat", className);
+                let chatContent = className === "outgoing" ? `<p></p>` : `<span class="fas fa-user-tie"></span><p></p>`;
+                chatLi.innerHTML = chatContent;
+                chatLi.querySelector("p").textContent = message;
+                return chatLi;
+            };
+
+            const handleChat = async () => {
+                const userMessage = chatInput.value.trim();
+                if (!userMessage) return;
+
+                chatInput.value = "";
+                chatInput.style.height = "auto";
+
+                chatbox.appendChild(createChatLi(userMessage, "outgoing"));
+                chatbox.scrollTo(0, chatbox.scrollHeight);
+
+                setTimeout(async () => {
+                    const incomingChatLi = createChatLi("Thinking...", "incoming");
+                    chatbox.appendChild(incomingChatLi);
+                    chatbox.scrollTo(0, chatbox.scrollHeight);
+
+                    const response = await getChatbotResponse(userMessage);
+                    // Use innerHTML for chatbot responses to support formatting and tracking cards
+                    incomingChatLi.querySelector("p").innerHTML = response;
+                    chatbox.scrollTo(0, chatbox.scrollHeight);
+                    // For speech, use a simplified text version if it's HTML
+                    const speechText = response.includes("tracking-card") ?
+                        `Status of Complaint ${userMessage.match(/\d+/)[0]} is currently being displayed.` : response;
+                    speak(speechText);
+                }, 600);
+            };
+
+            sendChatBtn.addEventListener("click", handleChat);
+            chatInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" && !e.shiftKey && window.innerWidth > 800) {
+                    e.preventDefault();
+                    handleChat();
+                }
+            });
+
+            // Voice Input (STT)
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.lang = 'en-US';
+
+                voiceBtn.addEventListener("click", () => {
+                    if (voiceBtn.classList.contains("listening")) {
+                        recognition.stop();
+                    } else {
+                        try {
+                            recognition.start();
+                            voiceBtn.classList.add("listening");
+                        } catch (err) { console.error("Speech recognition error:", err); }
+                    }
+                });
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    chatInput.value = transcript;
+                    voiceBtn.classList.remove("listening");
+                    handleChat();
+                };
+
+                recognition.onend = () => voiceBtn.classList.remove("listening");
+                recognition.onerror = () => voiceBtn.classList.remove("listening");
+            } else {
+                voiceBtn.style.display = "none";
+            }
+        }
+
+        async function getChatbotResponse(msg) {
+            msg = msg.toLowerCase();
+            const statusMatch = msg.match(/(?:status|complaint|id)\s*#?(\d+)/) || msg.match(/^#?(\d+)$/);
+            if (statusMatch) {
+                const id = statusMatch[1];
+                try {
+                    const res = await fetch(`${API_BASE_URL}/complaints/status/${id}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        const status = data.status.toLowerCase();
+
+                        // Determine step classes
+                        const isPending = status === 'pending';
+                        const isProgress = status === 'in_progress' || status === 'assigned';
+                        const isResolved = status === 'resolved';
+
+                        let steps = `
+                            <div class="step ${isPending || isProgress || isResolved ? 'completed' : ''} ${isPending ? 'active' : ''}">
+                                <div class="step-dot"></div><div class="step-label">Pending</div>
+                            </div>
+                            <div class="step ${isProgress || isResolved ? 'completed' : ''} ${isProgress ? 'active' : ''}">
+                                <div class="step-dot"></div><div class="step-label">Processing</div>
+                            </div>
+                            <div class="step ${isResolved ? 'completed' : ''} ${isResolved ? 'active' : ''}">
+                                <div class="step-dot"></div><div class="step-label">Resolved</div>
+                            </div>
+                        `;
+
+                        return `
+                            <div class="tracking-card">
+                                <div class="tracking-header">
+                                    <span class="tracking-id">Complaint #${id}</span>
+                                    <span class="tracking-status-label status-${status}">${status.replace('_', ' ').toUpperCase()}</span>
+                                </div>
+                                <div class="tracking-category">Category: ${data.category}</div>
+                                <div class="tracking-stepper">
+                                    ${steps}
+                                </div>
+                                <div class="tracking-footer">
+                                    <i class="fas fa-clock"></i> Last updated: ${new Date(data.updated_at).toLocaleString()}
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        return `I couldn't find details for Complaint #${id}. Please check the ID and try again.`;
+                    }
+                } catch (e) { return "Error connecting to service. Please try again later."; }
+            }
+            if (msg.includes("contact") || msg.includes("help") || msg.includes("support")) {
+                return "You can reach our 24/7 support line at help@jansamadhan.gov or call +91-1800-123-456. We're here to help!";
+            }
+            if (msg.includes("how to") || msg.includes("file") || msg.includes("submit") || msg.includes("filiup")) {
+                return "To file a complaint, follow these steps:\n1. <b>Login</b> to your account.\n2. Click on the <b>'Create Complaint'</b> tab.\n3. Enter the <b>Location</b> of the issue.\n4. Provide a detailed <b>Description</b>.\n5. Select the <b>Category</b> and <b>Priority</b>.\n6. You can <b>Upload Photos</b> of the issue.\n7. Click <b>Submit</b>.\n8. Go to <b>'My Complaints'</b> to see your status!";
+            }
+            if (msg.includes("photo") || msg.includes("image") || msg.includes("upload")) {
+                return "Yes! You can upload images while filing a complaint. This helps the technicians understand the problem better and leads to faster resolution.";
+            }
+            if (msg.includes("time") || msg.includes("long") || msg.includes("duration")) {
+                return "Most complaints are acknowledged within 24 hours. The resolution time depends on the category and priority, but we aim to resolve all issues within 3-5 working days.";
+            }
+            if (msg.includes("track") || msg.includes("check status")) {
+                return "To track your complaint, just type 'status' followed by your ID (e.g., 'status 33'). I'll show you a live progress card!";
+            }
+            return "How can I assist you with the Jan Samadhan portal today?";
+        }
+
+        function speak(text) {
+            if (!synth) return;
+            synth.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            // Select a female voice if available
+            const voices = synth.getVoices();
+            const femaleVoice = voices.find(v => (v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('google us english')) && v.lang.startsWith('en'));
+            if (femaleVoice) utter.voice = femaleVoice;
+            synth.speak(utter);
+        }
+    </script>
+    <button class="chatbot-toggler">
+        <span class="fas fa-comments"></span>
+        <span class="fas fa-times"></span>
+    </button>
+    <div class="chatbot">
+        <header>
+            <h5><span class="status-dot"></span><i class="fas fa-comments me-2"></i>Jan Samadhan Portal</h5>
+        </header>
+        <ul class="chatbox">
+            <li class="chat incoming">
+                <span class="fas fa-user-tie"></span>
+                <p>Hello! I am your Jan Samadhan Portal assistant. How can I help you today?</p>
+            </li>
+        </ul>
+        <div class="chat-input">
+            <span id="voice-btn" class="fas fa-microphone voice-btn" title="Speak"></span>
+            <textarea placeholder="Ask something..." spellcheck="false" required></textarea>
+            <span id="send-btn" class="fas fa-paper-plane" title="Send"></span>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

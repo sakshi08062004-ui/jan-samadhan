@@ -1,0 +1,38 @@
+<!-- ── Complaints View ── -->
+<div id="complaints-view">
+    <div class="section-header">
+        <div class="section-title" style="font-size:1.5rem;" id="complaints-title">Complaints</div>
+        <div class="search-bar">
+            <div id="dept-filter-btn" style="display:none;">
+                <button class="login-btn" style="width:auto;padding:0 1rem;background:#64748b;" onclick="clearDeptFilter()">
+                    <i class="fas fa-times"></i> Clear Filter
+                </button>
+            </div>
+            <div class="search-input">
+                <i class="fas fa-search"></i>
+                <input type="text" id="complaintSearch" placeholder="Search by title or department..." onkeyup="filterComplaints()">
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="table-container">
+            <table id="complaintsTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Evidence</th>
+                        <th>Complaint Name</th>
+                        <th>Description</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                        <th>Priority</th>
+                        <th>Address</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="complaintsBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
