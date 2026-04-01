@@ -1,14 +1,26 @@
-**/*.pyc
+# Python
 __pycache__/
+*.py[cod]
 *.pyo
+*.pyd
+*.pyc
 .env
-.venv/
 venv/
-.env
+env/
+
+# Database (exclude live DB — use setup_demo_data.py to seed)
+*.db
+*.sqlite3
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Editors
 .vscode/
 .idea/
+
+# Temp
+get_schema.py
+file_list.txt
 *.log
-node_modules/
-dist/
-build/
