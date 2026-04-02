@@ -69,5 +69,3 @@ JAN_SAMADHAN/
 
 ---
 
-**Developed by**: JAN SAMADHAN Development Team  
-**Version**: 2.0.0
